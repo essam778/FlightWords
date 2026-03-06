@@ -122,24 +122,6 @@ body {
   white-space: nowrap;
 }
 
-/* ======================== BOTTOM NAVIGATION ======================== */
-.bottom-nav {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 70px;
-  background: rgba(18, 21, 31, 0.98);
-  border-top: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-  backdrop-filter: blur(10px);
-  z-index: 1000;
-  padding: 8px 0 0 0;
-  gap: 0;
-}
-
 .nav-item {
   display: flex;
   flex-direction: column;
@@ -1683,18 +1665,19 @@ body.theme-lounge {
 
 /* ==================== RESPONSIVE - TABLET & DESKTOP ==================== */
 @media (min-width: 768px) {
-  /* Desktop layout - show sidebar as permanent panel */
+  /* Desktop layout - show sidebar as permanent panel + bottom nav */
   body {
     display: flex;
-    padding-bottom: 0;
+    flex-direction: column;
+    padding-bottom: 70px;
   }
 
   .sidebar {
-    transform: translateX(0) !important;
-    position: relative;
-    top: 0 !important;
+    position: absolute;
+    left: 0;
+    top: 0;
     width: 200px;
-    height: 100vh;
+    height: calc(100vh - 70px);
     flex-shrink: 0;
     overflow-y: auto;
     border-right: 1px solid var(--border);
@@ -1710,11 +1693,15 @@ body.theme-lounge {
   }
 
   .bottom-nav {
-    display: none !important;
+    display: flex !important;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
   }
 
   .screen {
-    flex: 1;
+    margin-left: 200px;
     min-height: auto;
   }
 

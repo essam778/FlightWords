@@ -475,6 +475,64 @@
     </div>
   </div>
 
+  <!-- ==================== SRS REVIEW SCREEN ==================== -->
+  <div class="screen" id="screen-srs">
+    <div class="unit-header">
+      <button class="back-btn" onclick="goHome()">←</button>
+      <div class="unit-header-title">مراجعة الكلمات</div>
+      <div class="unit-header-badge t2-badge" id="srs-count-badge">0 كلمة</div>
+    </div>
+
+    <div class="unit-content">
+      <div class="progress-wrap">
+        <div class="progress-info"><span id="srs-label">1/0</span><span id="srs-reviewed-count">✅ 0</span></div>
+        <div class="progress-track">
+          <div class="progress-fill" id="srs-bar" style="width:0%"></div>
+        </div>
+      </div>
+
+      <div class="fc-wrap" id="srs-card" onclick="flipSRSCard()">
+        <div class="fc-inner" id="srs-card-inner">
+          <div class="fc-face fc-front">
+            <div class="fc-sec-tag" id="srs-sec-tag"></div>
+            <div style="display:flex;align-items:center;justify-content:center;gap:10px;direction:ltr;margin-bottom:6px">
+              <div class="fc-en" id="srs-word" style="margin-bottom:0"></div>
+              <button class="audio-btn" onclick="event.stopPropagation(); playTTS(document.getElementById('srs-word').textContent)" style="background:transparent;border:none;cursor:pointer;font-size:1.4rem;transition:transform 0.2s" onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'" title="استمع للنطق">🎧</button>
+            </div>
+            <div class="fc-type-badge" id="srs-type"></div>
+            <div class="fc-hint">اضغط تشوف المعنى 👆</div>
+          </div>
+          <div class="fc-face fc-back">
+            <div class="fc-sec-tag" id="srs-back-sec"></div>
+            <div class="fc-ar" id="srs-ar"></div>
+            <div class="fc-def" id="srs-def"></div>
+            <div id="srs-ex" style="margin-top:12px; font-size:.85rem; color:var(--t2); direction:ltr; font-style:italic; padding:0 10px;"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="know-btns">
+        <button class="btn-know no" onclick="rateSRSCard(false)">❌ صعبة</button>
+        <button class="btn-know yes" onclick="rateSRSCard(true)">✅ حافظتها</button>
+      </div>
+
+      <div class="know-stats" id="srs-stats">0 من 0</div>
+
+      <div class="ctrl-row">
+        <button class="btn sm" onclick="prevSRSCard()">→ السابق</button>
+        <button class="btn sm primary" onclick="nextSRSCard()">← التالي</button>
+        <button class="btn sm" onclick="shuffleSRSCards()">🔀 خلط</button>
+      </div>
+
+      <div class="results-box hidden" id="srs-results" style="margin-top:20px">
+        <div style="font-size:1.2rem;font-weight:900">انتهت المراجعة! 🎉</div>
+        <div style="font-size:3rem;font-weight:900;color:var(--t2);margin:12px 0" id="srs-final-count">0</div>
+        <p id="srs-result-msg" style="color:var(--muted)">محفوظ بنجاح</p>
+        <button class="btn primary" style="width:100%" onclick="goHome()">← العودة للرئيسية</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ==================== DASHBOARD SCREEN ==================== -->
   <div class="screen" id="screen-dashboard">
     <div class="unit-header">

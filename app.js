@@ -590,21 +590,171 @@ function focusSearch() {
 }
 
 // Open SRS review
+let srsWords = [];
+let srsIndex = 0;
+let srsOrder = [];
+let srsReviewedCount = 0;
+
 function openSRSReview() {
-  const today = new Date().toISOString().split('T')[0];
-  const srsWords = Object.entries(srsData).filter(([w, d]) => {
-    const lastReview = new Date(d.lastReviewDate);
-    const nextReview = new Date(lastReview.getTime() + (d.interval * 24 * 60 * 60 * 1000));
-    return new Date() >= nextReview;
-  }).map(([w]) => w);
+  const now = Date.now();
   
-  if (srsWords.length === 0) {
-    alert('لا توجد كلمات للمراجعة الآن 🎉');
+  // Get words that need review from SRS
+  let reviewWords = Object.entries(srsData)
+    .filter(([w, d]) => {
+      const nextReview = d.nextReview || 0;
+      return now >= nextReview;
+    })
+    .map(([w, d]) => {
+      // Find the word in UNITS_DATA
+      for (const unitIdx in UNITS_DATA) {
+        const unit = UNITS_DATA[unitIdx];
+        if (!unit.parts) continue;
+        for (const partIdx in unit.parts) {
+          const part = unit.parts[partIdx];
+          const foundWord = part.words?.find(x => x.en === w);
+          if (foundWord) {
+            return { en: w, ...foundWord, unitIdx, partIdx };
+          }
+        }
+      }
+      return { en: w };
+    });
+  
+  // If no words found, add sample words from Unit 7 for demo
+  if (reviewWords.length === 0) {
+    const unit7 = UNITS_DATA[7];
+    if (unit7?.parts?.[1]?.words) {
+      reviewWords = unit7.parts[1].words.slice(0, 5).map(w => ({ ...w, unitIdx: 7, partIdx: 1 }));
+    } else {
+      alert('الرجاء الدراسة أولاً عبر Unit flashcard! 📚\nقول "❌ لسه مش حافظ" على الكلمات، وستظهر هنا للمراجعة 🔄');
+      return;
+    }
+  }
+  
+  srsWords = reviewWords;
+  srsOrder = shuffle([...Array(srsWords.length).keys()]);
+  srsIndex = 0;
+  srsReviewedCount = 0;
+  
+  // Close sidebar and show screen
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('sidebar-overlay');
+  sidebar.classList.remove('active');
+  overlay.classList.remove('active');
+  document.body.style.overflow = '';
+  
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-srs').classList.add('active');
+  
+  updateBottomNav('srs');
+  renderSRSCard();
+}
+
+function renderSRSCard() {
+  if (srsIndex >= srsOrder.length) {
+    document.getElementById('srs-results').classList.remove('hidden');
+    document.querySelector('#screen-srs .progress-wrap').classList.add('hidden');
+    document.querySelector('#screen-srs .fc-wrap').classList.add('hidden');
+    document.querySelector('#screen-srs .know-btns').classList.add('hidden');
+    document.querySelector('#screen-srs .know-stats').classList.add('hidden');
+    document.querySelector('#screen-srs .ctrl-row').classList.add('hidden');
+    document.getElementById('srs-final-count').textContent = srsReviewedCount;
+    document.getElementById('srs-result-msg').textContent = `عرفت ${srsReviewedCount} من ${srsWords.length} كلمات بنجاح! 🎓`;
     return;
   }
   
-  updateBottomNav('srs');
-  alert(`هناك ${srsWords.length} كلمة للمراجعة! 🔄`);
+  const wordData = srsWords[srsOrder[srsIndex]];
+  if (!wordData) {
+    srsIndex++;
+    renderSRSCard();
+    return;
+  }
+  
+  // Update labels
+  document.getElementById('srs-label').textContent = `${srsIndex + 1}/${srsWords.length}`;
+  document.getElementById('srs-count-badge').textContent = `${srsWords.length} كلمة`;
+  document.getElementById('srs-reviewed-count').textContent = `✅ ${srsReviewedCount}`;
+  document.getElementById('srs-bar').style.width = `${(srsIndex / srsWords.length) * 100}%`;
+  document.getElementById('srs-stats').textContent = `تم مراجعة: ${srsReviewedCount} من ${srsWords.length}`;
+  
+  // Reset card flip
+  const inner = document.getElementById('srs-card-inner');
+  inner.style.transform = 'rotateY(0deg)';
+  
+  // Populate card data
+  document.getElementById('srs-word').textContent = wordData.en || '';
+  document.getElementById('srs-ar').textContent = wordData.ar || '';
+  document.getElementById('srs-def').textContent = wordData.def || '';
+  document.getElementById('srs-type').textContent = wordData.type || 'n.';
+  document.getElementById('srs-sec-tag').textContent = (wordData.s || 'all');
+  document.getElementById('srs-back-sec').textContent = (wordData.s || 'all');
+  
+  if (wordData.ex) {
+    document.getElementById('srs-ex').textContent = `📌 "${wordData.ex}"`;
+  } else {
+    document.getElementById('srs-ex').textContent = '';
+  }
+}
+
+function flipSRSCard() {
+  const inner = document.getElementById('srs-card-inner');
+  inner.style.transform = inner.style.transform === 'rotateY(0deg)' ? 'rotateY(180deg)' : 'rotateY(0deg)';
+}
+
+function rateSRSCard(knew) {
+  const wordData = srsWords[srsOrder[srsIndex]];
+  if (!wordData) return;
+  
+  // Update SRS data
+  let item = srsData[wordData.en] || { interval: 0, repetition: 0, efactor: 2.5, lastReviewDate: new Date().toISOString() };
+  const q = knew ? 4 : 1; // 4 = knew perfectly, 1 = forgot
+  
+  if (q >= 3) {
+    if (item.repetition === 0) item.interval = 1;
+    else if (item.repetition === 1) item.interval = 6;
+    else item.interval = Math.round(item.interval * item.efactor);
+    item.repetition++;
+    item.efactor = item.efactor + (0.1 - (5 - q) * (0.08 + (5 - q) * 0.02));
+  } else {
+    item.repetition = 0;
+    item.interval = 1;
+    item.efactor = Math.max(1.3, item.efactor - 0.2);
+  }
+  item.efactor = Math.max(1.3, item.efactor);
+  item.lastReviewDate = new Date().toISOString();
+  item.nextReview = Date.now() + item.interval * 24 * 60 * 60 * 1000;
+  srsData[wordData.en] = item;
+  saveSRS();
+  
+  if (knew) {
+    srsReviewedCount++;
+    knownWordsGlobal.add(wordData.en);
+  }
+  saveProgress();
+  
+  // Animate
+  playSfx(knew ? 'correct' : 'wrong');
+  
+  // Move to next
+  srsIndex++;
+  renderSRSCard();
+}
+
+function nextSRSCard() {
+  srsIndex++;
+  renderSRSCard();
+}
+
+function prevSRSCard() {
+  srsIndex = Math.max(0, srsIndex - 1);
+  renderSRSCard();
+}
+
+function shuffleSRSCards() {
+  srsOrder = shuffle(srsOrder);
+  srsIndex = 0;
+  srsReviewedCount = 0;
+  renderSRSCard();
 }
 
 function buildPartTabs() {
@@ -821,7 +971,7 @@ function markCard(k) {
   const i = fcOrder[fcIndex];
   const w = filteredWords[i];
 
-  let item = srsData[w.en] || { interval: 0, repetition: 0, efactor: 2.5 };
+  let item = srsData[w.en] || { interval: 0, repetition: 0, efactor: 2.5, lastReviewDate: new Date().toISOString() };
   const q = k ? 4 : 1;
   if (q >= 3) {
     if (item.repetition === 0) item.interval = 1;
@@ -835,6 +985,7 @@ function markCard(k) {
     item.efactor = Math.max(1.3, item.efactor - 0.2);
   }
   item.efactor = Math.max(1.3, item.efactor);
+  item.lastReviewDate = new Date().toISOString();
   item.nextReview = Date.now() + item.interval * 24 * 60 * 60 * 1000;
   srsData[w.en] = item;
   saveSRS();
