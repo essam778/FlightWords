@@ -19,42 +19,42 @@ function toggleSidebar() {
 function buildUnitsUI() {
   const heroUnits = document.getElementById('hero-units');
   if (!heroUnits) return;
-  
+
   // Ensure my custom words is there
   const myWordsCard = heroUnits.querySelector('[onclick*="openUnit(0)"]')?.closest('.term-card');
-  
+
   // Build Term 1 and Term 2 cards dynamically
   let term1Units = [];
   let term2Units = [];
-  
+
   Object.keys(UNITS_DATA).forEach(unitKey => {
     const unit = UNITS_DATA[unitKey];
     if (!unit.term) return;
-    
+
     if (unit.term === 1) {
       term1Units.push({ num: parseInt(unitKey), ...unit });
     } else if (unit.term === 2) {
       term2Units.push({ num: parseInt(unitKey), ...unit });
     }
   });
-  
+
   term1Units.sort((a, b) => a.num - b.num);
   term2Units.sort((a, b) => a.num - b.num);
-  
+
   // Update or create term 1 card
   let term1Card = [...heroUnits.querySelectorAll('.term-card')].find(c => c.textContent.includes('الترم الأول'));
   if (term1Card) {
     const unitsStrip = term1Card.querySelector('.units-strip');
-    unitsStrip.innerHTML = term1Units.map((u, i) => 
+    unitsStrip.innerHTML = term1Units.map((u, i) =>
       `<div class="unit-chip active-unit done" onclick="event.stopPropagation();openUnit(${u.num})">Unit ${u.num} ✓</div>`
     ).join('');
   }
-  
+
   // Update or create term 2 card
   let term2Card = [...heroUnits.querySelectorAll('.term-card')].find(c => c.textContent.includes('الترم الثاني'));
   if (term2Card) {
     const unitsStrip = term2Card.querySelector('.units-strip');
-    unitsStrip.innerHTML = term2Units.map((u, i) => 
+    unitsStrip.innerHTML = term2Units.map((u, i) =>
       `<div class="unit-chip active-unit ${i < term2Units.length - 1 ? 'done' : ''}" onclick="event.stopPropagation();openUnit(${u.num})">Unit ${u.num} ${i < term2Units.length - 1 ? '✓' : ''}</div>`
     ).join('');
   }
@@ -217,6 +217,25 @@ let speedInterval = null;
 let speedScore = 0;
 let currentSpeedWord = null;
 
+// ========================================================
+// APP STATE PERSISTENCE
+// ========================================================
+function saveAppState() {
+  const state = {
+    currentUnit,
+    currentPart,
+    currentFeat,
+    currentSec,
+    activeScreen: getCurrentActiveScreen()
+  };
+  localStorage.setItem('flightWords_appState', JSON.stringify(state));
+}
+
+function getCurrentActiveScreen() {
+  const active = document.querySelector('.screen.active');
+  return active ? active.id : 'screen-home';
+}
+
 function shuffle(array) {
   let cur = array.length, rand;
   while (cur !== 0) {
@@ -234,7 +253,7 @@ function showFeat(featId) {
 
   // If we are on home screen and launching a global feature
   if (homeScreen.classList.contains('active')) {
-    homeScreen.classList.remove('active');
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     unitScreen.classList.add('active');
     document.querySelector('.unit-header-title').textContent = 'Global Challenge';
   }
@@ -266,6 +285,8 @@ function showFeat(featId) {
   if (featId === 'crossword') initCrossword();
   if (featId === 'roleplay') initRoleplay();
   if (featId === 'autopilot') initAutopilot();
+
+  saveAppState();
 }
 
 let cwSolution = [];
@@ -382,7 +403,7 @@ function handleSearch() {
     const searchResultsMobile = document.getElementById('search-results-mobile');
     const mobileView = document.getElementById('home-mobile-view');
     const isMobile = window.innerWidth < 768;
-    
+
     if (query.length < 2) {
       if (heroUnits) heroUnits.classList.remove('hidden');
       if (searchResults) searchResults.classList.add('hidden');
@@ -503,21 +524,28 @@ function goHome() {
   sidebar.classList.remove('active');
   overlay.classList.remove('active');
   document.body.style.overflow = '';
-  
+
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-home').classList.add('active');
   const search = document.getElementById('global-search');
   if (search) search.value = '';
-  
+
+  // Reset search results
+  const searchResults = document.getElementById('search-results');
+  if (searchResults) searchResults.classList.add('hidden');
+  const heroUnits = document.getElementById('hero-units');
+  if (heroUnits) heroUnits.classList.remove('hidden');
+
   // Update bottom nav
   updateBottomNav('home');
+  saveAppState();
 }
 
 // Update bottom nav active state
 function updateBottomNav(page) {
   const navItems = document.querySelectorAll('.nav-item');
   navItems.forEach(item => item.classList.remove('active'));
-  
+
   if (page === 'home') {
     document.getElementById('nav-home')?.classList.add('active');
   } else if (page === 'dashboard') {
@@ -537,7 +565,7 @@ function openDashboard() {
   sidebar.classList.remove('active');
   overlay.classList.remove('active');
   document.body.style.overflow = '';
-  
+
   updateDashboardRanks();
   renderBadges();
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -547,9 +575,10 @@ function openDashboard() {
   const acc = totalQuizQuestions > 0 ? Math.round((totalQuizCorrect / totalQuizQuestions) * 100) : 0;
   document.getElementById('dash-accuracy').textContent = acc + '%';
   document.getElementById('dash-words').textContent = knownWordsGlobal.size;
-  
+
   // Update bottom nav
   updateBottomNav('dashboard');
+  saveAppState();
 }
 
 function openTermOrUnit(term, unit) {
@@ -564,24 +593,35 @@ function openUnit(unitNum) {
   sidebar.classList.remove('active');
   overlay.classList.remove('active');
   document.body.style.overflow = '';
-  
+
   currentUnit = unitNum;
   const unit = UNITS_DATA[unitNum];
   if (!unit) { showComingSoon(unitNum); return; }
-  document.getElementById('screen-home').classList.remove('active');
+
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-unit').classList.add('active');
+
   const headerTitle = document.getElementById('unit-header-title');
   const headerSub = document.getElementById('unit-header-subtitle');
-  if (headerTitle) headerTitle.textContent = unitNum === 0 ? "My Words" : `Unit ${unitNum}`;  
+  if (headerTitle) headerTitle.textContent = unitNum === 0 ? "My Words" : `Unit ${unitNum}`;
   if (headerSub) headerSub.textContent = unit.title || '';
   document.getElementById('unit-term-badge').textContent = unitNum === 0 ? "خاص" : `ترم ${unit.term}`;
   document.getElementById('unit-term-badge').className = 'unit-header-badge ' + (unitNum === 0 ? 't1-badge' : (unit.term === 1 ? 't1-badge' : 't2-badge'));
   currentPart = 1;
   currentFeat = 'flashcard';
   document.querySelectorAll('.feat-tab').forEach((t, i) => { t.classList.toggle('active', i === 0); });
-  // Note: Unit opening doesn't have a specific bottom nav item, so we don't update it
+
+  // For mobile navigation
+  const homeMobile = document.getElementById('home-mobile-view');
+  if (homeMobile) homeMobile.classList.add('hidden');
+  const homeUnits = document.getElementById('home-units-view');
+  if (homeUnits) homeUnits.classList.add('hidden');
+  const homeParts = document.getElementById('home-parts-view');
+  if (homeParts) homeParts.classList.add('hidden');
+
   buildPartTabs();
   switchPart(1);
+  saveAppState();
 }
 
 function showComingSoon(unitNum) {
@@ -599,6 +639,7 @@ function showScreen(screenId) {
       updateBottomNav('dashboard');
       openDashboard();
     }
+    saveAppState();
   }
 }
 
@@ -619,7 +660,7 @@ let srsReviewedCount = 0;
 
 function openSRSReview() {
   const now = Date.now();
-  
+
   // Get words that need review from SRS
   let reviewWords = Object.entries(srsData)
     .filter(([w, d]) => {
@@ -641,7 +682,7 @@ function openSRSReview() {
       }
       return { en: w };
     });
-  
+
   // If no words found, add sample words from Unit 7 for demo
   if (reviewWords.length === 0) {
     const unit7 = UNITS_DATA[7];
@@ -652,24 +693,25 @@ function openSRSReview() {
       return;
     }
   }
-  
+
   srsWords = reviewWords;
   srsOrder = shuffle([...Array(srsWords.length).keys()]);
   srsIndex = 0;
   srsReviewedCount = 0;
-  
+
   // Close sidebar and show screen
   const sidebar = document.getElementById('sidebar');
   const overlay = document.getElementById('sidebar-overlay');
   sidebar.classList.remove('active');
   overlay.classList.remove('active');
   document.body.style.overflow = '';
-  
+
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-srs').classList.add('active');
-  
+
   updateBottomNav('srs');
   renderSRSCard();
+  saveAppState();
 }
 
 function renderSRSCard() {
@@ -684,25 +726,25 @@ function renderSRSCard() {
     document.getElementById('srs-result-msg').textContent = `عرفت ${srsReviewedCount} من ${srsWords.length} كلمات بنجاح! 🎓`;
     return;
   }
-  
+
   const wordData = srsWords[srsOrder[srsIndex]];
   if (!wordData) {
     srsIndex++;
     renderSRSCard();
     return;
   }
-  
+
   // Update labels
   document.getElementById('srs-label').textContent = `${srsIndex + 1}/${srsWords.length}`;
   document.getElementById('srs-count-badge').textContent = `${srsWords.length} كلمة`;
   document.getElementById('srs-reviewed-count').textContent = `✅ ${srsReviewedCount}`;
   document.getElementById('srs-bar').style.width = `${(srsIndex / srsWords.length) * 100}%`;
   document.getElementById('srs-stats').textContent = `تم مراجعة: ${srsReviewedCount} من ${srsWords.length}`;
-  
+
   // Reset card flip
   const inner = document.getElementById('srs-card-inner');
   inner.style.transform = 'rotateY(0deg)';
-  
+
   // Populate card data
   document.getElementById('srs-word').textContent = wordData.en || '';
   document.getElementById('srs-ar').textContent = wordData.ar || '';
@@ -710,7 +752,7 @@ function renderSRSCard() {
   document.getElementById('srs-type').textContent = wordData.type || 'n.';
   document.getElementById('srs-sec-tag').textContent = (wordData.s || 'all');
   document.getElementById('srs-back-sec').textContent = (wordData.s || 'all');
-  
+
   if (wordData.ex) {
     document.getElementById('srs-ex').textContent = `📌 "${wordData.ex}"`;
   } else {
@@ -726,11 +768,11 @@ function flipSRSCard() {
 function rateSRSCard(knew) {
   const wordData = srsWords[srsOrder[srsIndex]];
   if (!wordData) return;
-  
+
   // Update SRS data
   let item = srsData[wordData.en] || { interval: 0, repetition: 0, efactor: 2.5, lastReviewDate: new Date().toISOString() };
   const q = knew ? 4 : 1; // 4 = knew perfectly, 1 = forgot
-  
+
   if (q >= 3) {
     if (item.repetition === 0) item.interval = 1;
     else if (item.repetition === 1) item.interval = 6;
@@ -747,16 +789,16 @@ function rateSRSCard(knew) {
   item.nextReview = Date.now() + item.interval * 24 * 60 * 60 * 1000;
   srsData[wordData.en] = item;
   saveSRS();
-  
+
   if (knew) {
     srsReviewedCount++;
     knownWordsGlobal.add(wordData.en);
   }
   saveProgress();
-  
+
   // Animate
   playSfx(knew ? 'correct' : 'wrong');
-  
+
   // Move to next
   srsIndex++;
   renderSRSCard();
@@ -801,6 +843,7 @@ function switchPart(p) {
   });
   buildSecSelector();
   applyFilter();
+  saveAppState();
 }
 
 function buildSecSelector() {
@@ -1176,7 +1219,10 @@ function newMatchRound() {
   matchPairs = pool; matchSelected = null; matchMatched = 0;
   matchStartTime = Date.now();
   clearInterval(matchInterval);
-  matchInterval = setInterval(() => { document.getElementById('match-live-time').textContent = ((Date.now() - matchStartTime) / 1000).toFixed(1) + 's'; }, 100);
+  matchInterval = setInterval(() => {
+    const el = document.getElementById('match-live-time');
+    if (el) el.textContent = ((Date.now() - matchStartTime) / 1000).toFixed(1) + 's';
+  }, 100);
   const en = shuffle(pool.map((w, i) => ({ ...w, idx: i, side: 'en' })));
   const ar = shuffle(pool.map((w, i) => ({ ...w, idx: i, side: 'ar' })));
   const combined = []; for (let i = 0; i < pool.length; i++) { combined.push(en[i]); combined.push(ar[i]); }
@@ -1740,6 +1786,10 @@ if (themeToggle) {
 function initApp() {
   buildUnitsUI();
   updateDashboardRanks();
+
+  // Restore State
+  const savedState = JSON.parse(localStorage.getItem('flightWords_appState'));
+
   const params = new URLSearchParams(window.location.search);
   const matchParam = params.get('match');
   if (matchParam) {
@@ -1756,7 +1806,28 @@ function initApp() {
     }
   }
 
+  if (savedState) {
+    currentUnit = savedState.currentUnit;
+    currentPart = savedState.currentPart;
+    currentFeat = savedState.currentFeat;
+    currentSec = savedState.currentSec || 'all';
+
+    if (savedState.activeScreen === 'screen-unit') {
+      openUnit(currentUnit);
+      switchPart(currentPart);
+      showFeat(currentFeat);
+      return;
+    } else if (savedState.activeScreen === 'screen-dashboard') {
+      openDashboard();
+      return;
+    } else if (savedState.activeScreen === 'screen-srs') {
+      openSRSReview();
+      return;
+    }
+  }
+
   // Default: Go to Home Screen
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-home').classList.add('active');
   updateBottomNav('home');
 }
@@ -1847,12 +1918,12 @@ function showMobileTermsView() {
   const homeDesktop = document.getElementById('home-desktop-view');
   const homeMobile = document.getElementById('home-mobile-view');
   const homeUnits = document.getElementById('home-units-view');
-  
+
   if (window.innerWidth < 768) {
     homeDesktop.classList.add('hidden');
     homeMobile.classList.remove('hidden');
     homeUnits.classList.add('hidden');
-    
+
     // Update mobile stats
     updateMobileStats();
   } else {
@@ -1865,10 +1936,10 @@ function showMobileTermsView() {
 function updateMobileStats() {
   const totalWords = knownWordsGlobal.size;
   const totalUnits = Object.keys(UNITS_DATA).filter(k => UNITS_DATA[k].parts).length;
-  
+
   const wordsEl = document.getElementById('stat-words-mobile');
   const unitsEl = document.getElementById('stat-units-mobile');
-  
+
   if (wordsEl) wordsEl.textContent = totalWords;
   if (unitsEl) unitsEl.textContent = totalUnits;
 }
@@ -1877,13 +1948,13 @@ function showTermUnits(termNum) {
   const units = termNum === 1 ? [1, 2, 3, 4, 5, 6] : [7, 8, 9, 10, 11, 12];
   const unitsList = document.getElementById('mobile-units-list');
   unitsList.innerHTML = '';
-  
+
   document.getElementById('units-view-title').textContent = `الترم ${termNum === 1 ? 'الأول' : 'الثاني'}`;
-  
+
   units.forEach(unitNum => {
     const unit = UNITS_DATA[unitNum];
     if (!unit) return;
-    
+
     const card = document.createElement('div');
     card.style.cssText = 'background: var(--card); border: 2px solid var(--border); padding: 16px; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; margin-bottom: 12px;';
     card.onmouseover = () => {
@@ -1897,7 +1968,7 @@ function showTermUnits(termNum) {
       card.style.transform = 'translateX(0)';
     };
     card.onclick = () => showUnitParts(unitNum);
-    
+
     card.innerHTML = `
       <div style="display: flex; align-items: center; gap: 12px;">
         <div style="font-size: 2rem;">📚</div>
@@ -1911,7 +1982,7 @@ function showTermUnits(termNum) {
     `;
     unitsList.appendChild(card);
   });
-  
+
   document.getElementById('home-desktop-view').classList.add('hidden');
   document.getElementById('home-mobile-view').classList.add('hidden');
   document.getElementById('home-units-view').classList.remove('hidden');
@@ -1926,19 +1997,19 @@ function hideMobileUnitView() {
 function showUnitParts(unitNum) {
   const unit = UNITS_DATA[unitNum];
   if (!unit) return;
-  
+
   const partsList = document.getElementById('mobile-parts-list');
   partsList.innerHTML = '';
-  
+
   document.getElementById('parts-view-title').textContent = `Unit ${unitNum}`;
-  
+
   Object.entries(unit.parts).forEach(([partNum, partData]) => {
     const card = document.createElement('div');
     card.style.cssText = 'background: var(--card); border: 1px solid var(--t2); padding: 20px; border-radius: 12px; cursor: pointer; transition: all 0.25s ease; text-align: center;';
     card.onmouseover = () => card.style.backgroundColor = 'var(--panel)';
     card.onmouseout = () => card.style.backgroundColor = 'var(--card)';
     card.onclick = () => goToUnitDirectly(unitNum, parseInt(partNum));
-    
+
     const wordCount = partData.words ? partData.words.length : 0;
     card.innerHTML = `
       <div style="font-size: 2.5rem; margin-bottom: 12px;">📖</div>
@@ -1947,7 +2018,7 @@ function showUnitParts(unitNum) {
     `;
     partsList.appendChild(card);
   });
-  
+
   document.getElementById('home-units-view').classList.add('hidden');
   document.getElementById('home-parts-view').classList.remove('hidden');
 }
