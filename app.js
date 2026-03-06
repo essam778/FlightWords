@@ -379,14 +379,34 @@ function handleSearch() {
     const query = document.getElementById('global-search').value.trim().toLowerCase();
     const heroUnits = document.getElementById('hero-units');
     const searchResults = document.getElementById('search-results');
+    const searchResultsMobile = document.getElementById('search-results-mobile');
+    const mobileView = document.getElementById('home-mobile-view');
+    const isMobile = window.innerWidth < 768;
+    
     if (query.length < 2) {
-      heroUnits.classList.remove('hidden');
-      searchResults.classList.add('hidden');
+      if (heroUnits) heroUnits.classList.remove('hidden');
+      if (searchResults) searchResults.classList.add('hidden');
+      if (searchResultsMobile) searchResultsMobile.classList.add('hidden');
+      if (mobileView && !mobileView.classList.contains('hidden')) {
+        // Show mobile content
+        const mobContent = document.querySelectorAll('#home-mobile-view > div:not(#search-results-mobile)');
+        mobContent.forEach(el => el.style.display = 'block');
+      }
       return;
     }
-    heroUnits.classList.add('hidden');
-    searchResults.classList.remove('hidden');
-    searchResults.innerHTML = `<h3 style="color:var(--t2); margin-bottom:15px">نتائج البحث عن: "${query}"</h3>`;
+
+    // Hide content
+    if (heroUnits) heroUnits.classList.add('hidden');
+    if (mobileView && !mobileView.classList.contains('hidden')) {
+      const mobContent = document.querySelectorAll('#home-mobile-view > div:not(#search-results-mobile)');
+      mobContent.forEach(el => el.style.display = 'none');
+    }
+
+    const resultsContainer = isMobile ? searchResultsMobile : searchResults;
+    if (!resultsContainer) return;
+
+    resultsContainer.classList.remove('hidden');
+    resultsContainer.innerHTML = `<h3 style="color:var(--t2); margin-bottom:15px">نتائج البحث عن: "${query}"</h3>`;
     const results = [];
 
     // Search in Custom Words
@@ -408,12 +428,13 @@ function handleSearch() {
     });
 
     if (!results.length) {
-      searchResults.innerHTML += `<div style="text-align:center; padding:40px; color:var(--muted)">لا توجد نتائج 🔍</div>`;
+      resultsContainer.innerHTML += `<div style="text-align:center; padding:40px; color:var(--muted)">لا توجد نتائج 🔍</div>`;
       return;
     }
 
     const grid = document.createElement('div');
     grid.className = 'terms-grid';
+    grid.style.padding = isMobile ? '0' : '8px';
     // Limit to 20 results for performance
     results.slice(0, 20).forEach(w => {
       const card = document.createElement('div');
@@ -421,7 +442,6 @@ function handleSearch() {
       card.style.padding = '15px';
       card.onclick = () => {
         if (w.unit !== 0) openUnit(parseInt(w.unit));
-        else { /* Show custom word? */ }
       };
       card.innerHTML = `
         <div style="display:flex; justify-content:space-between; align-items:center">
@@ -432,7 +452,7 @@ function handleSearch() {
       `;
       grid.appendChild(card);
     });
-    searchResults.appendChild(grid);
+    resultsContainer.appendChild(grid);
   }, 300); // 300ms debounce
 }
 
@@ -533,7 +553,9 @@ function openDashboard() {
 }
 
 function openTermOrUnit(term, unit) {
-  if (term === 1) { alert('الترم الأول قريبًا! 🔒\nهنضيف الوحدات وحدة وحدة 🚀'); return; }
+  // Navigation handled by showTermUnits() function
+  if (term === 1) { showTermUnits(1); }
+  if (term === 2) { showTermUnits(2); }
 }
 
 function openUnit(unitNum) {
@@ -550,7 +572,7 @@ function openUnit(unitNum) {
   document.getElementById('screen-unit').classList.add('active');
   const headerTitle = document.getElementById('unit-header-title');
   const headerSub = document.getElementById('unit-header-subtitle');
-  if (headerTitle) headerTitle.textContent = unitNum === 0 ? "My Words" : `Unit ${unitNum}`;
+  if (headerTitle) headerTitle.textContent = unitNum === 0 ? "My Words" : `Unit ${unitNum}`;  
   if (headerSub) headerSub.textContent = unit.title || '';
   document.getElementById('unit-term-badge').textContent = unitNum === 0 ? "خاص" : `ترم ${unit.term}`;
   document.getElementById('unit-term-badge').className = 'unit-header-badge ' + (unitNum === 0 ? 't1-badge' : (unit.term === 1 ? 't1-badge' : 't2-badge'));
@@ -1817,3 +1839,140 @@ goHome = function () {
   stopAutopilot();
   originalGoHome();
 };
+
+// ========================================================
+// MOBILE NAVIGATION - TERMS, UNITS, PARTS
+// ========================================================
+function showMobileTermsView() {
+  const homeDesktop = document.getElementById('home-desktop-view');
+  const homeMobile = document.getElementById('home-mobile-view');
+  const homeUnits = document.getElementById('home-units-view');
+  
+  if (window.innerWidth < 768) {
+    homeDesktop.classList.add('hidden');
+    homeMobile.classList.remove('hidden');
+    homeUnits.classList.add('hidden');
+    
+    // Update mobile stats
+    updateMobileStats();
+  } else {
+    homeDesktop.classList.remove('hidden');
+    homeMobile.classList.add('hidden');
+    homeUnits.classList.add('hidden');
+  }
+}
+
+function updateMobileStats() {
+  const totalWords = knownWordsGlobal.size;
+  const totalUnits = Object.keys(UNITS_DATA).filter(k => UNITS_DATA[k].parts).length;
+  
+  const wordsEl = document.getElementById('stat-words-mobile');
+  const unitsEl = document.getElementById('stat-units-mobile');
+  
+  if (wordsEl) wordsEl.textContent = totalWords;
+  if (unitsEl) unitsEl.textContent = totalUnits;
+}
+
+function showTermUnits(termNum) {
+  const units = termNum === 1 ? [1, 2, 3, 4, 5, 6] : [7, 8, 9, 10, 11, 12];
+  const unitsList = document.getElementById('mobile-units-list');
+  unitsList.innerHTML = '';
+  
+  document.getElementById('units-view-title').textContent = `الترم ${termNum === 1 ? 'الأول' : 'الثاني'}`;
+  
+  units.forEach(unitNum => {
+    const unit = UNITS_DATA[unitNum];
+    if (!unit) return;
+    
+    const card = document.createElement('div');
+    card.style.cssText = 'background: var(--card); border: 2px solid var(--border); padding: 16px; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; margin-bottom: 12px;';
+    card.onmouseover = () => {
+      card.style.backgroundColor = 'var(--panel)';
+      card.style.borderColor = 'var(--t2)';
+      card.style.transform = 'translateX(-4px)';
+    };
+    card.onmouseout = () => {
+      card.style.backgroundColor = 'var(--card)';
+      card.style.borderColor = 'var(--border)';
+      card.style.transform = 'translateX(0)';
+    };
+    card.onclick = () => showUnitParts(unitNum);
+    
+    card.innerHTML = `
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <div style="font-size: 2rem;">📚</div>
+        <div style="flex: 1;">
+          <div style="font-size: 1.1rem; font-weight: 900; color: var(--t1);">Unit ${unitNum}</div>
+          <div style="font-size: 0.85rem; color: var(--muted); margin-top: 4px;">${unit.title || 'Unit'}</div>
+          <div style="font-size: 0.75rem; color: var(--t2); margin-top: 4px; font-weight: 700;">${Object.values(unit.parts).reduce((sum, p) => sum + (p.words ? p.words.length : 0), 0)} كلمة</div>
+        </div>
+        <div style="font-size: 1.3rem; color: var(--t2);">←</div>
+      </div>
+    `;
+    unitsList.appendChild(card);
+  });
+  
+  document.getElementById('home-desktop-view').classList.add('hidden');
+  document.getElementById('home-mobile-view').classList.add('hidden');
+  document.getElementById('home-units-view').classList.remove('hidden');
+}
+
+function hideMobileUnitView() {
+  document.getElementById('home-desktop-view').classList.remove('hidden');
+  document.getElementById('home-mobile-view').classList.remove('hidden');
+  document.getElementById('home-units-view').classList.add('hidden');
+}
+
+function showUnitParts(unitNum) {
+  const unit = UNITS_DATA[unitNum];
+  if (!unit) return;
+  
+  const partsList = document.getElementById('mobile-parts-list');
+  partsList.innerHTML = '';
+  
+  document.getElementById('parts-view-title').textContent = `Unit ${unitNum}`;
+  
+  Object.entries(unit.parts).forEach(([partNum, partData]) => {
+    const card = document.createElement('div');
+    card.style.cssText = 'background: var(--card); border: 1px solid var(--t2); padding: 20px; border-radius: 12px; cursor: pointer; transition: all 0.25s ease; text-align: center;';
+    card.onmouseover = () => card.style.backgroundColor = 'var(--panel)';
+    card.onmouseout = () => card.style.backgroundColor = 'var(--card)';
+    card.onclick = () => goToUnitDirectly(unitNum, parseInt(partNum));
+    
+    const wordCount = partData.words ? partData.words.length : 0;
+    card.innerHTML = `
+      <div style="font-size: 2.5rem; margin-bottom: 12px;">📖</div>
+      <div style="font-size: 1.3rem; font-weight: 900; color: var(--t2); margin-bottom: 8px;">${partData.label}</div>
+      <div style="font-size: 0.9rem; color: var(--muted);">${wordCount} كلمات</div>
+    `;
+    partsList.appendChild(card);
+  });
+  
+  document.getElementById('home-units-view').classList.add('hidden');
+  document.getElementById('home-parts-view').classList.remove('hidden');
+}
+
+function hidePartsView() {
+  document.getElementById('home-parts-view').classList.add('hidden');
+  document.getElementById('home-units-view').classList.remove('hidden');
+  document.getElementById('home-units-view').classList.remove('hidden');
+}
+
+function goToUnitDirectly(unitNum, partNum) {
+  // Hide navigation views
+  document.getElementById('home-units-view').classList.add('hidden');
+  document.getElementById('home-parts-view').classList.add('hidden');
+  document.getElementById('home-mobile-view').classList.add('hidden');
+  document.getElementById('home-desktop-view').classList.add('hidden');
+  openUnit(unitNum);
+  setTimeout(() => {
+    switchPart(partNum);
+  }, 100);
+}
+
+// Initialize mobile view on page load
+document.addEventListener('DOMContentLoaded', () => {
+  showMobileTermsView();
+  updateMobileStats();
+  window.addEventListener('resize', showMobileTermsView);
+});

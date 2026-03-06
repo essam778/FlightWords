@@ -2,25 +2,35 @@
    FLIGHTWORDS — Dark Aviation Theme
    ========================================================= */
 :root {
-  --void: #07080c;
-  --deep: #0d0f18;
-  --panel: #12151f;
-  --card: #191d2a;
-  --border: #252a3a;
-  --t1: #e8a020;
-  /* Term 1 — amber */
-  --t2: #20a8e8;
-  /* Term 2 — sky blue */
-  --t1-dim: #7a4a08;
-  --t2-dim: #084a7a;
-  --accent: #e85020;
-  --green: #20c070;
-  --red: #e03040;
-  --text: #e8eaf2;
-  --muted: #606880;
-  --muted2: #404858;
-  --done: #20c070;
-  --locked: #303545;
+  /* Primary Colors - Enhanced */
+  --void: #050709;
+  --deep: #0a0e1a;
+  --panel: #0f1621;
+  --card: #131820;
+  --border: #1e2536;
+  
+  /* Accent Colors - Better Contrast */
+  --t1: #ffa500;
+  --t2: #00bfff;
+  --t1-dim: #6b4a08;
+  --t2-dim: #003d7a;
+  --accent: #ff6b35;
+  --green: #2ec470;
+  --red: #ff4444;
+  --text: #f0f4f8;
+  --muted: #7a8fa0;
+  --muted2: #505d70;
+  --done: #2ec470;
+  --locked: #2a3142;
+  
+  /* Gradients */
+  --gradient-primary: linear-gradient(135deg, #ffa500 0%, #ff8c00 100%);
+  --gradient-secondary: linear-gradient(135deg, #00bfff 0%, #0096d6 100%);
+  --gradient-accent: linear-gradient(135deg, #ff6b35 0%, #ff4500 100%);
+  --gradient-success: linear-gradient(135deg, #2ec470 0%, #20a560 100%);
+  --shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.3);
+  --shadow-medium: 0 8px 24px rgba(0, 0, 0, 0.5);
+  --shadow-heavy: 0 12px 40px rgba(0, 0, 0, 0.7);
 }
 
 [data-theme="light"] {
@@ -1753,6 +1763,67 @@ body.theme-lounge {
     padding-bottom: 70px;
   }
 
+  /* Mobile feature cards */
+  .mobile-feature-card {
+    background: var(--card);
+    border: 2px solid var(--border);
+    padding: 14px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+  }
+
+  .mobile-feature-card:hover {
+    background: var(--panel);
+    border-color: var(--t2);
+    transform: translateX(-4px);
+  }
+
+  .mobile-term-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 16px;
+    border-radius: 10px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+  }
+
+  .mobile-term-card:hover {
+    background: var(--panel);
+    border-color: var(--t2);
+    transform: translateX(-4px);
+  }
+
+  #home-desktop-view.hidden {
+    display: none !important;
+  }
+
+  #home-mobile-view:not(.hidden) {
+    display: block !important;
+  }
+
+  #home-units-view,
+  #home-parts-view {
+    display: none;
+  }
+
+  #home-units-view.hidden,
+  #home-parts-view.hidden {
+    display: none !important;
+  }
+
+  #home-mobile-view.hidden {
+    display: none !important;
+  }
+
+  /* Show when not hidden */
+  #home-units-view:not(.hidden),
+  #home-parts-view:not(.hidden) {
+    display: block !important;
+  }
+
   .sidebar {
     width: calc(100vw - 60px);
     max-width: 280px;
@@ -1874,24 +1945,55 @@ body.theme-lounge {
 
   .part-tabs {
     padding: 0;
+    position: sticky;
+    top: 70px;
+    background: var(--panel);
+    z-index: 50;
+    border-bottom: 1px solid var(--border);
   }
 
   .part-tab {
-    padding: 9px 11px;
-    font-size: 0.75rem;
+    padding: 12px 14px;
+    font-size: 0.85rem;
+    flex: 1;
+    border-radius: 0;
   }
 
+  /* Make feat-tabs more visible on mobile */
   .feat-tabs {
     padding: 0;
+    position: sticky;
+    top: 70px;
+    background: var(--card);
+    z-index: 50;
+    border-bottom: 2px solid var(--t2);
+    border-radius: 0;
+    gap: 0;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
   }
 
   .feat-tab {
-    padding: 9px 10px;
-    font-size: 0.7rem;
+    padding: 14px 12px;
+    font-size: 0.75rem;
+    min-width: max-content;
+    border-radius: 0;
+    border-bottom: 3px solid transparent;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+    font-weight: 700;
   }
 
-  .unit-top-controls {
-    padding: 9px 11px;
+  .feat-tab:hover {
+    background: var(--deep);
+    color: var(--t2) !important;
+  }
+
+  .feat-tab.active {
+    color: var(--t2) !important;
+    background: var(--deep);
+    border-bottom: 3px solid var(--t2) !important;
   }
 
   .sec-selector {
@@ -1899,12 +2001,48 @@ body.theme-lounge {
   }
 
   .sec-btn {
-    padding: 4px 9px;
+    padding: 6px 10px;
     font-size: 0.75rem;
+    flex-shrink: 0;
   }
 
   .unit-content {
     padding: 11px;
+  }
+
+  /* ===== AUDIO BUTTONS - IMPROVED FOR MOBILE ===== */
+  .audio-btn {
+    background: linear-gradient(135deg, var(--t2), #1a6ba8) !important;
+    border: 2px solid var(--t2) !important;
+    color: white !important;
+    padding: 8px 10px !important;
+    border-radius: 8px !important;
+    font-size: 1.2rem !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    box-shadow: 0 4px 12px rgba(32, 168, 232, 0.3) !important;
+  }
+
+  .audio-btn:hover {
+    background: linear-gradient(135deg, #1a8ec8, #0f5a8a) !important;
+    box-shadow: 0 6px 16px rgba(32, 168, 232, 0.5) !important;
+    transform: scale(1.15) !important;
+  }
+
+  .audio-btn:active {
+    transform: scale(0.95) !important;
+    box-shadow: 0 2px 8px rgba(32, 168, 232, 0.3) !important;
+  }
+
+  .mic-btn {
+    background: linear-gradient(135deg, #e8a020, #c87000) !important;
+    border: 2px solid #e8a020 !important;
+    box-shadow: 0 4px 12px rgba(232, 160, 32, 0.3) !important;
+  }
+
+  .mic-btn:hover {
+    background: linear-gradient(135deg, #f0b030, #d88010) !important;
+    box-shadow: 0 6px 16px rgba(232, 160, 32, 0.5) !important;
   }
 
   /* Flashcard */
@@ -1914,33 +2052,44 @@ body.theme-lounge {
   }
 
   .fc-en {
-    font-size: 1.6rem;
+    font-size: 1.8rem;
+    font-weight: 900;
   }
 
   .fc-ar {
-    font-size: 1.3rem;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--t2);
   }
 
   .fc-type-badge {
-    font-size: 0.7rem;
+    font-size: 0.75rem;
+    background: var(--deep);
+    color: var(--muted);
   }
 
   .know-btns {
-    gap: 7px;
+    gap: 8px;
   }
 
   .btn-know {
-    padding: 9px;
-    font-size: 0.8rem;
+    padding: 12px;
+    font-size: 0.85rem;
+    border-radius: 8px;
+    font-weight: 700;
+    flex: 1;
   }
 
   .ctrl-row {
-    gap: 6px;
+    gap: 8px;
+    margin-top: 16px;
   }
 
   .ctrl-row .btn {
-    padding: 9px 7px;
+    padding: 10px 8px;
     font-size: 0.8rem;
+    flex: 1;
+    border-radius: 8px;
   }
 
   /* Quiz */
@@ -1951,21 +2100,24 @@ body.theme-lounge {
 
   .opts-grid {
     grid-template-columns: 1fr;
-    gap: 7px;
+    gap: 8px;
   }
 
   .quiz-q {
-    padding: 12px;
-    margin-bottom: 10px;
+    padding: 14px;
+    margin-bottom: 12px;
+    border-radius: 10px;
   }
 
   .q-word {
-    font-size: 1.4rem;
+    font-size: 1.6rem;
+    font-weight: 900;
   }
 
   .choice {
-    padding: 10px;
-    font-size: 0.9rem;
+    padding: 12px;
+    font-size: 0.95rem;
+    border-radius: 8px;
   }
 
   /* Modal */

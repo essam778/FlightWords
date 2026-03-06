@@ -42,151 +42,319 @@
 </head>
 
 <body>
+  <!-- ==================== LOGIN SCREEN ==================== -->
+  <div class="screen" id="screen-login" style="background: var(--void); padding: 0; display: flex; align-items: center; justify-content: center;">
+    <div style="text-align: center; padding: 40px 20px; max-width: 340px; width: 100%;">
+      <div style="font-size: 4rem; margin-bottom: 20px;">✈️</div>
+      <h1 style="font-family: 'Syne', sans-serif; font-size: 2.2rem; font-weight: 900; background: var(--gradient-secondary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 10px;">FlightWords</h1>
+      <p style="color: var(--muted); font-size: 0.95rem; margin-bottom: 32px;">رحلتك لإتقان الإنجليزية في الثانوية العامة</p>
+      <input type="text" id="login-username" placeholder="اسم المستخدم" style="width: 100%; padding: 12px 14px; margin-bottom: 10px; background: var(--card); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 1rem; outline: none; text-align: right;">
+      <input type="password" id="login-password" placeholder="كلمة السر" style="width: 100%; padding: 12px 14px; margin-bottom: 20px; background: var(--card); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 1rem; outline: none; text-align: right;">
+      <button class="btn primary" onclick="loginUser()" style="width: 100%; padding: 12px; font-size: 1rem; margin-bottom: 10px; background: var(--gradient-primary); border: none; font-weight: 900;">دخول</button>
+      <button class="btn" onclick="toggleSignup()" style="width: 100%; padding: 12px; font-size: 1rem;">حساب جديد</button>
+    </div>
+  </div>
+
   <!-- ==================== HOME SCREEN ==================== -->
   <div class="screen active" id="screen-home">
-    <div class="home-hero">
-      <div class="brand-tag">English · Thanaweya Amma · 2026</div>
-      <div class="brand-name">FlightWords</div>
-      <div class="brand-sub">رحلتك لإتقان الإنجليزية — وحدة وحدة 🚀</div>
-      <div class="search-wrap"
-        style="margin-top:20px; position:relative; width:100%; max-width:400px; margin-left:auto; margin-right:auto;">
-        <input type="text" id="global-search" placeholder="ابحث عن أي كلمة..." oninput="handleSearch()"
-          style="width:100%; padding:12px 20px 12px 45px; border-radius:99px; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); color:white; font-size:1rem; outline:none; backdrop-filter:blur(10px); text-align:right;">
-        <span style="position:absolute; left:15px; top:50%; transform:translateY(-50%); opacity:0.7;">🔍</span>
+    <!-- DESKTOP/TABLET VIEW - ALL FEATURES -->
+    <div id="home-desktop-view">
+      <div class="home-hero">
+        <div class="brand-tag">English · Thanaweya Amma · 2026</div>
+        <div class="brand-name">FlightWords</div>
+        <div class="brand-sub">رحلتك لإتقان الإنجليزية — وحدة وحدة 🚀</div>
+        <div class="search-wrap"
+          style="margin-top:20px; position:relative; width:100%; max-width:400px; margin-left:auto; margin-right:auto;">
+          <input type="text" id="global-search" placeholder="ابحث عن أي كلمة..." oninput="handleSearch()"
+            style="width:100%; padding:12px 20px 12px 45px; border-radius:99px; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); color:white; font-size:1rem; outline:none; backdrop-filter:blur(10px); text-align:right;">
+          <span style="position:absolute; left:15px; top:50%; transform:translateY(-50%); opacity:0.7;">🔍</span>
+        </div>
+        <div class="brand-stats">
+          <div class="stat-item"><span class="stat-num" id="stat-words">0</span><span class="stat-lbl">كلمة</span></div>
+          <div class="stat-item"><span class="stat-num" id="stat-units">0</span><span class="stat-lbl">وحدات</span></div>
+          <div class="stat-item"><span class="stat-num">12</span><span class="stat-lbl">إجمالي</span></div>
+        </div>
       </div>
-      <div class="brand-stats">
-        <div class="stat-item"><span class="stat-num" id="stat-words">0</span><span class="stat-lbl">كلمة</span></div>
-        <div class="stat-item"><span class="stat-num" id="stat-units">0</span><span class="stat-lbl">وحدات</span></div>
-        <div class="stat-item"><span class="stat-num">12</span><span class="stat-lbl">إجمالي</span></div>
+
+      <div id="search-results" class="hidden" style="padding:20px; direction:rtl;">
+        <!-- Search results injected here -->
+      </div>
+
+      <div class="terms-grid" id="hero-units">
+        <!-- CUSTOM WORDS -->
+        <div class="term-card term1" style="border-color:var(--green)">
+          <div class="term-card-header">
+            <div class="term-icon" style="background:var(--green); color:#fff">📝</div>
+            <div>
+              <div class="term-title">كلماتي الخاصة (My Words)</div>
+              <div class="term-subtitle">أضف كلماتك الخاصة وتدرب عليها</div>
+            </div>
+            <button class="btn sm primary" onclick="event.stopPropagation(); showAddWordModal()"
+              style="margin-right:auto">+ أضف</button>
+          </div>
+          <div class="units-strip">
+            <div class="unit-chip active-unit done" style="border-color:var(--green); color:var(--green)"
+              onclick="event.stopPropagation();openUnit(0)">تدرب الآن ←</div>
+          </div>
+        </div>
+
+        <!-- SPEED CHALLENGE -->
+        <div class="term-card term2" style="border-color:#e94560" onclick="showFeat('speed-challenge')">
+          <div class="term-card-header">
+            <div class="term-icon" style="background:#e94560; color:#fff">⚡</div>
+            <div>
+              <div class="term-title">تحدي الـ 60 ثانية</div>
+              <div class="term-subtitle">كم كلمة تترجمها في دقيقة؟</div>
+            </div>
+            <div class="term-badge" style="background:#e9456033; color:#e94560">تحدي سريع</div>
+          </div>
+          <div class="units-strip">
+            <div class="unit-chip active-unit" style="border-color:#e94560; color:#e94560">ابدأ التحدي 🔥</div>
+          </div>
+        </div>
+
+        <!-- ROLEPLAY -->
+        <div class="term-card term1" style="border-color:var(--t2)" onclick="showFeat('roleplay')">
+          <div class="term-card-header">
+            <div class="term-icon" style="background:var(--void); border:1px solid var(--border)">🗣️</div>
+            <div>
+              <div class="term-title">محاكاة المطار</div>
+              <div class="term-subtitle">تحدث مع ضابط الجوازات</div>
+            </div>
+            <div class="term-badge" style="background:var(--panel); color:var(--t2)">مستوى متقدم</div>
+          </div>
+          <div class="units-strip">
+            <div class="unit-chip active-unit" style="border-color:var(--t2); color:var(--t2)">ابدأ المحادثة ←</div>
+          </div>
+        </div>
+
+        <!-- CROSSWORD -->
+        <div class="term-card term1" style="border-color:#20c070" onclick="showFeat('crossword')">
+          <div class="term-card-header">
+            <div class="term-icon" style="background:#20c070; color:#fff">🧩</div>
+            <div>
+              <div class="term-title">كلمات متقاطعة</div>
+              <div class="term-subtitle">اختبر ذاكرتك في الكتابة</div>
+            </div>
+            <div class="term-badge" style="background:#20c07033; color:#20c070">لعبة ذكاء</div>
+          </div>
+          <div class="units-strip">
+            <div class="unit-chip active-unit" style="border-color:#20c070; color:#20c070">العب الآن 🎮</div>
+          </div>
+        </div>
+
+        <!-- AUTOPILOT -->
+        <div class="term-card term2" style="border-color:var(--t2)" onclick="showFeat('autopilot')">
+          <div class="term-card-header">
+            <div class="term-icon" style="background:var(--void); border:1px solid var(--border)">🚁</div>
+            <div>
+              <div class="term-title">وضع الطيار الآلي</div>
+              <div class="term-subtitle">مراجعة تلقائية بدون لمس الشاشة</div>
+            </div>
+            <div class="term-badge" style="background:var(--panel); color:var(--t2)">جديد 🔥</div>
+          </div>
+          <div class="units-strip">
+            <div class="unit-chip active-unit" style="border-color:var(--t2); color:var(--t2)">انطلق الآن ←</div>
+          </div>
+        </div>
+
+        <!-- TERM 1 -->
+        <div class="term-card term1" onclick="showTermUnits(1)">
+          <div class="term-card-header">
+            <div class="term-icon">🌅</div>
+            <div>
+              <div class="term-title">الترم الأول</div>
+              <div class="term-subtitle">Units 1 – 6</div>
+            </div>
+            <div class="term-badge" id="term1-badge">جاري 6/6 • 650+ كلمة</div>
+          </div>
+          <div class="term-progress-bar">
+            <div class="term-progress-fill" style="width:100%"></div>
+          </div>
+          <div class="units-strip" id="term1-units">
+            <div class="unit-chip active-unit done" onclick="event.stopPropagation();openUnit(1)">Unit 1 ✓</div>
+            <div class="unit-chip active-unit done" onclick="event.stopPropagation();openUnit(2)">Unit 2 ✓</div>
+            <div class="unit-chip active-unit done" onclick="event.stopPropagation();openUnit(3)">Unit 3 ✓</div>
+            <div class="unit-chip active-unit done" onclick="event.stopPropagation();openUnit(4)">Unit 4 ✓</div>
+            <div class="unit-chip active-unit done" onclick="event.stopPropagation();openUnit(5)">Unit 5 ✓</div>
+            <div class="unit-chip active-unit done" onclick="event.stopPropagation();openUnit(6)">Unit 6 ✓</div>
+          </div>
+        </div>
+
+        <!-- TERM 2 -->
+        <div class="term-card term2" onclick="showTermUnits(2)">
+          <div class="term-card-header">
+            <div class="term-icon">✈️</div>
+            <div>
+              <div class="term-title">الترم الثاني</div>
+              <div class="term-subtitle">Units 7 – 12</div>
+            </div>
+            <div class="term-badge" id="term2-badge">مكتمل 6/6 • 680+ كلمة</div>
+          </div>
+          <div class="term-progress-bar">
+            <div class="term-progress-fill" style="width:100%"></div>
+          </div>
+          <div class="units-strip" id="term2-units">
+            <div class="unit-chip active-unit done" onclick="event.stopPropagation();openUnit(7)">Unit 7 ✓</div>
+            <div class="unit-chip active-unit done" onclick="event.stopPropagation();openUnit(8)">Unit 8 ✓</div>
+            <div class="unit-chip active-unit done" onclick="event.stopPropagation();openUnit(9)">Unit 9 ✓</div>
+            <div class="unit-chip active-unit done" onclick="event.stopPropagation();openUnit(10)">Unit 10 ✓</div>
+            <div class="unit-chip active-unit done" onclick="event.stopPropagation();openUnit(11)">Unit 11 ✓</div>
+            <div class="unit-chip active-unit done" onclick="event.stopPropagation();openUnit(12)">Unit 12 ✓</div>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div id="search-results" class="hidden" style="padding:20px; direction:rtl;">
-      <!-- Search results injected here -->
+    <!-- MOBILE VIEW - TERMS ONLY -->
+    <div id="home-mobile-view" class="hidden" style="padding: 16px; direction: rtl; overflow-y: auto; padding-bottom: 100px;">
+      <!-- SEARCH BAR -->
+      <div style="margin-bottom: 20px;">
+        <div style="position:relative; width:100%;">
+          <input type="text" id="global-search" placeholder="ابحث عن أي كلمة..." oninput="handleSearch()"
+            style="width:100%; padding:12px 20px 12px 45px; border-radius:99px; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); color:white; font-size:0.95rem; outline:none; backdrop-filter:blur(10px); text-align:right;">
+          <span style="position:absolute; left:15px; top:50%; transform:translateY(-50%); opacity:0.7;">🔍</span>
+        </div>
+      </div>
+
+      <!-- QUICK STATS -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 20px;">
+        <div style="background: var(--card); border: 1px solid var(--border); padding: 12px; border-radius: 8px; text-align: center;">
+          <div style="font-size: 0.7rem; color: var(--muted);">كلمات</div>
+          <div style="font-size: 1.4rem; font-weight: 900; color: var(--t2); margin-top: 4px;" id="stat-words-mobile">0</div>
+        </div>
+        <div style="background: var(--card); border: 1px solid var(--border); padding: 12px; border-radius: 8px; text-align: center;">
+          <div style="font-size: 0.7rem; color: var(--muted);">وحدات</div>
+          <div style="font-size: 1.4rem; font-weight: 900; color: var(--t1); margin-top: 4px;" id="stat-units-mobile">0</div>
+        </div>
+        <div style="background: var(--card); border: 1px solid var(--border); padding: 12px; border-radius: 8px; text-align: center;">
+          <div style="font-size: 0.7rem; color: var(--muted);">إجمالي</div>
+          <div style="font-size: 1.4rem; font-weight: 900; color: var(--green); margin-top: 4px;">12</div>
+        </div>
+      </div>
+
+      <!-- MY WORDS CARD -->
+      <div class="mobile-feature-card" style="border-color: var(--green); cursor: pointer;" onclick="openUnit(0)">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div style="font-size: 2.5rem;">📝</div>
+          <div style="flex: 1;">
+            <div style="font-size: 1.05rem; font-weight: 900; color: var(--t1);">كلماتي الخاصة</div>
+            <div style="font-size: 0.8rem; color: var(--muted); margin-top: 2px;">أضف وتدرب</div>
+          </div>
+          <button onclick="event.stopPropagation(); showAddWordModal()" class="btn sm primary" style="padding: 6px 8px; font-size: 0.7rem;">+ أضف</button>
+        </div>
+      </div>
+
+      <!-- CHALLENGES & GAMES SECTION -->
+      <div style="margin-top: 20px; margin-bottom: 20px;">
+        <div style="font-size: 0.9rem; font-weight: 900; color: var(--muted); margin-bottom: 12px; padding: 0 8px;">🎮 تحديات وألعاب</div>
+        
+        <!-- SPEED CHALLENGE -->
+        <div class="mobile-feature-card" style="border-color: #e94560; cursor: pointer;" onclick="showFeat('speed-challenge')">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="font-size: 2.2rem;">⚡</div>
+            <div style="flex: 1;">
+              <div style="font-size: 1.05rem; font-weight: 900; color: var(--t1);">تحدي 60 ثانية</div>
+              <div style="font-size: 0.75rem; color: var(--muted); margin-top: 2px;">كم كلمة تترجم؟</div>
+            </div>
+            <div style="font-size: 1.6rem;">🔥</div>
+          </div>
+        </div>
+
+        <!-- ROLEPLAY -->
+        <div class="mobile-feature-card" style="border-color: var(--t2); cursor: pointer; margin-top: 10px;" onclick="showFeat('roleplay')">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="font-size: 2.2rem;">🗣️</div>
+            <div style="flex: 1;">
+              <div style="font-size: 1.05rem; font-weight: 900; color: var(--t1);">محاكاة المطار</div>
+              <div style="font-size: 0.75rem; color: var(--muted); margin-top: 2px;">تحدث مع الحارس</div>
+            </div>
+            <div style="font-size: 1.6rem;">💬</div>
+          </div>
+        </div>
+
+        <!-- CROSSWORD -->
+        <div class="mobile-feature-card" style="border-color: #20c070; cursor: pointer; margin-top: 10px;" onclick="showFeat('crossword')">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="font-size: 2.2rem;">🧩</div>
+            <div style="flex: 1;">
+              <div style="font-size: 1.05rem; font-weight: 900; color: var(--t1);">كلمات متقاطعة</div>
+              <div style="font-size: 0.75rem; color: var(--muted); margin-top: 2px;">لعبة ذكاء</div>
+            </div>
+            <div style="font-size: 1.6rem;">🎮</div>
+          </div>
+        </div>
+
+        <!-- AUTOPILOT -->
+        <div class="mobile-feature-card" style="border-color: var(--t2); cursor: pointer; margin-top: 10px;" onclick="showFeat('autopilot')">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="font-size: 2.2rem;">🚁</div>
+            <div style="flex: 1;">
+              <div style="font-size: 1.05rem; font-weight: 900; color: var(--t1);">الطيار الآلي</div>
+              <div style="font-size: 0.75rem; color: var(--muted); margin-top: 2px;">مراجعة تلقائية</div>
+            </div>
+            <div style="font-size: 1.6rem;">✨</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TERMS SECTION -->
+      <div style="margin-top: 20px;">
+        <div style="font-size: 0.9rem; font-weight: 900; color: var(--muted); margin-bottom: 12px; padding: 0 8px;">📚 الترمينات</div>
+
+        <!-- TERM 1 CARD -->
+        <div class="mobile-term-card" onclick="showTermUnits(1)">
+          <div style="display: flex; align-items: center; gap: 15px;">
+            <div style="font-size: 2.5rem;">🌅</div>
+            <div style="flex: 1;">
+              <div style="font-size: 1.1rem; font-weight: 900; color: var(--t1);">الترم الأول</div>
+              <div style="font-size: 0.8rem; color: var(--muted); margin-top: 4px;">Units 1 – 6</div>
+              <div style="font-size: 0.75rem; color: var(--green); margin-top: 6px; font-weight: 700;">✓ 6/6 وحدات • 650+ كلمة</div>
+            </div>
+            <div style="font-size: 1.3rem; color: var(--t2);">←</div>
+          </div>
+        </div>
+
+        <!-- TERM 2 CARD -->
+        <div class="mobile-term-card" onclick="showTermUnits(2)">
+          <div style="display: flex; align-items: center; gap: 15px;">
+            <div style="font-size: 2.5rem;">✈️</div>
+            <div style="flex: 1;">
+              <div style="font-size: 1.1rem; font-weight: 900; color: var(--t1);">الترم الثاني</div>
+              <div style="font-size: 0.8rem; color: var(--muted); margin-top: 4px;">Units 7 – 12</div>
+              <div style="font-size: 0.75rem; color: var(--green); margin-top: 6px; font-weight: 700;">✓ 6/6 وحدات • 680+ كلمة</div>
+            </div>
+            <div style="font-size: 1.3rem; color: var(--t2);">←</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="search-results-mobile" class="hidden" style="direction: rtl; padding-top: 20px;">
+        <!-- Mobile search results -->
+      </div>
     </div>
 
-    <div class="terms-grid" id="hero-units">
-      <!-- CUSTOM WORDS -->
-      <div class="term-card term1" style="border-color:var(--green)">
-        <div class="term-card-header">
-          <div class="term-icon" style="background:var(--green); color:#fff">📝</div>
-          <div>
-            <div class="term-title">كلماتي الخاصة (My Words)</div>
-            <div class="term-subtitle">أضف كلماتك الخاصة وتدرب عليها</div>
-          </div>
-          <button class="btn sm primary" onclick="event.stopPropagation(); showAddWordModal()"
-            style="margin-right:auto">+ أضف</button>
-        </div>
-        <div class="units-strip">
-          <div class="unit-chip active-unit done" style="border-color:var(--green); color:var(--green)"
-            onclick="event.stopPropagation();openUnit(0)">تدرب الآن ←</div>
-        </div>
+    <!-- UNITS VIEW (shown after selecting term on mobile) -->
+    <div id="home-units-view" class="hidden" style="padding: 0;">
+      <div style="background: var(--panel); border-bottom: 1px solid var(--border); padding: 12px 16px; display: flex; align-items: center; gap: 12px; position: sticky; top: 70px; z-index: 100;">
+        <button onclick="hideMobileUnitView()" style="background: none; border: none; color: var(--t2); cursor: pointer; font-size: 1.3rem;">←</button>
+        <div style="flex: 1; text-align: center; font-weight: 900; color: var(--t1);" id="units-view-title">الوحدات</div>
+        <div style="width: 30px;"></div>
       </div>
-
-      <!-- SPEED CHALLENGE -->
-      <div class="term-card term2" style="border-color:#e94560" onclick="showFeat('speed-challenge')">
-        <div class="term-card-header">
-          <div class="term-icon" style="background:#e94560; color:#fff">⚡</div>
-          <div>
-            <div class="term-title">تحدي الـ 60 ثانية</div>
-            <div class="term-subtitle">كم كلمة تترجمها في دقيقة؟</div>
-          </div>
-          <div class="term-badge" style="background:#e9456033; color:#e94560">تحدي سريع</div>
-        </div>
-        <div class="units-strip">
-          <div class="unit-chip active-unit" style="border-color:#e94560; color:#e94560">ابدأ التحدي 🔥</div>
-        </div>
+      <div style="padding: 16px;" id="mobile-units-list">
+        <!-- Units injected here -->
       </div>
+    </div>
 
-      <!-- ROLEPLAY -->
-      <div class="term-card term1" style="border-color:var(--t2)" onclick="showFeat('roleplay')">
-        <div class="term-card-header">
-          <div class="term-icon" style="background:var(--void); border:1px solid var(--border)">🗣️</div>
-          <div>
-            <div class="term-title">محاكاة المطار</div>
-            <div class="term-subtitle">تحدث مع ضابط الجوازات</div>
-          </div>
-          <div class="term-badge" style="background:var(--panel); color:var(--t2)">مستوى متقدم</div>
-        </div>
-        <div class="units-strip">
-          <div class="unit-chip active-unit" style="border-color:var(--t2); color:var(--t2)">ابدأ المحادثة ←</div>
-        </div>
+    <!-- PARTS VIEW (shown after selecting unit on mobile) -->
+    <div id="home-parts-view" class="hidden" style="padding: 0;">
+      <div style="background: var(--panel); border-bottom: 1px solid var(--border); padding: 12px 16px; display: flex; align-items: center; gap: 12px; position: sticky; top: 70px; z-index: 100;">
+        <button onclick="hidePartsView()" style="background: none; border: none; color: var(--t2); cursor: pointer; font-size: 1.3rem;">←</button>
+        <div style="flex: 1; text-align: center; font-weight: 900; color: var(--t1);" id="parts-view-title">الأجزاء</div>
+        <div style="width: 30px;"></div>
       </div>
-
-      <!-- CROSSWORD -->
-      <div class="term-card term1" style="border-color:#20c070" onclick="showFeat('crossword')">
-        <div class="term-card-header">
-          <div class="term-icon" style="background:#20c070; color:#fff">🧩</div>
-          <div>
-            <div class="term-title">كلمات متقاطعة</div>
-            <div class="term-subtitle">اختبر ذاكرتك في الكتابة</div>
-          </div>
-          <div class="term-badge" style="background:#20c07033; color:#20c070">لعبة ذكاء</div>
-        </div>
-        <div class="units-strip">
-          <div class="unit-chip active-unit" style="border-color:#20c070; color:#20c070">العب الآن 🎮</div>
-        </div>
-      </div>
-
-      <!-- AUTOPILOT -->
-      <div class="term-card term2" style="border-color:var(--t2)" onclick="showFeat('autopilot')">
-        <div class="term-card-header">
-          <div class="term-icon" style="background:var(--void); border:1px solid var(--border)">🚁</div>
-          <div>
-            <div class="term-title">وضع الطيار الآلي</div>
-            <div class="term-subtitle">مراجعة تلقائية بدون لمس الشاشة</div>
-          </div>
-          <div class="term-badge" style="background:var(--panel); color:var(--t2)">جديد 🔥</div>
-        </div>
-        <div class="units-strip">
-          <div class="unit-chip active-unit" style="border-color:var(--t2); color:var(--t2)">انطلق الآن ←</div>
-        </div>
-      </div>
-
-      <!-- TERM 1 -->
-      <div class="term-card term1" onclick="openTermOrUnit(1, null)">
-        <div class="term-card-header">
-          <div class="term-icon">🌅</div>
-          <div>
-            <div class="term-title">الترم الأول</div>
-            <div class="term-subtitle">Units 1 – 6</div>
-          </div>
-          <div class="term-badge" id="term1-badge">جاري 6/6 • 650+ كلمة</div>
-        </div>
-        <div class="term-progress-bar">
-          <div class="term-progress-fill" style="width:100%"></div>
-        </div>
-        <div class="units-strip" id="term1-units">
-          <div class="unit-chip active-unit done" onclick="event.stopPropagation();openUnit(1)">Unit 1 ✓</div>
-          <div class="unit-chip active-unit done" onclick="event.stopPropagation();openUnit(2)">Unit 2 ✓</div>
-          <div class="unit-chip active-unit done" onclick="event.stopPropagation();openUnit(3)">Unit 3 ✓</div>
-          <div class="unit-chip active-unit done" onclick="event.stopPropagation();openUnit(4)">Unit 4 ✓</div>
-          <div class="unit-chip active-unit done" onclick="event.stopPropagation();openUnit(5)">Unit 5 ✓</div>
-          <div class="unit-chip active-unit done" onclick="event.stopPropagation();openUnit(6)">Unit 6 ✓</div>
-        </div>
-      </div>
-
-      <!-- TERM 2 -->
-      <div class="term-card term2">
-        <div class="term-card-header">
-          <div class="term-icon">✈️</div>
-          <div>
-            <div class="term-title">الترم الثاني</div>
-            <div class="term-subtitle">Units 7 – 12</div>
-          </div>
-          <div class="term-badge" id="term2-badge">مكتمل 6/6 • 680+ كلمة</div>
-        </div>
-        <div class="term-progress-bar">
-          <div class="term-progress-fill" style="width:100%"></div>
-        </div>
-        <div class="units-strip" id="term2-units">
-          <div class="unit-chip active-unit done" onclick="event.stopPropagation();openUnit(7)">Unit 7 ✓</div>
-          <div class="unit-chip active-unit done" onclick="event.stopPropagation();openUnit(8)">Unit 8 ✓</div>
-          <div class="unit-chip active-unit done" onclick="event.stopPropagation();openUnit(9)">Unit 9 ✓</div>
-          <div class="unit-chip active-unit done" onclick="event.stopPropagation();openUnit(10)">Unit 10 ✓</div>
-          <div class="unit-chip active-unit done" onclick="event.stopPropagation();openUnit(11)">Unit 11 ✓</div>
-          <div class="unit-chip active-unit done" onclick="event.stopPropagation();openUnit(12)">Unit 12 ✓</div>
-        </div>
+      <div style="padding: 16px; display: flex; flex-direction: column; gap: 12px;" id="mobile-parts-list">
+        <!-- Parts (Part 1, Part 2) injected here -->
       </div>
     </div>
   </div>
