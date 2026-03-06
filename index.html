@@ -14,29 +14,34 @@
   <link rel="stylesheet" href="style.css">
 </head>
 
-<body>
-  <div style="position:fixed; top:12px; left:12px; z-index:100; display:flex; gap:8px;">
-    <button id="theme-toggle" class="btn sm"
-      style="font-size:1.2rem; padding:4px 8px; border-radius:50%; width:36px; height:36px; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 10px rgba(0,0,0,0.2);">🌞</button>
-    <div id="streak-badge"
-      style="background:var(--card); border:1px solid var(--border); padding:4px 10px; border-radius:99px; font-weight:700; color:#ea580c; display:flex; align-items:center; box-shadow:0 4px 10px rgba(0,0,0,0.2);">
-      🔥 0</div>
-    <div id="rank-badge"
-      style="background:var(--card); border:1px solid var(--border); padding:4px 10px; border-radius:99px; font-weight:700; color:var(--t2); display:flex; align-items:center; box-shadow:0 4px 10px rgba(0,0,0,0.2);">
-      👨‍🎓 Student</div>
-    <button class="btn sm" onclick="requestPushPermission()"
-      style="background:var(--card); border:1px solid var(--border); border-radius:50%; width:36px; height:36px; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 10px rgba(0,0,0,0.2);">🔔</button>
-    <button class="btn sm" onclick="openDashboard()"
-      style="border-radius:99px; box-shadow:0 4px 10px rgba(0,0,0,0.2);">📊 إحصائيات</button>
-    <select id="bg-selector" onchange="changeBgTheme(this.value)"
-      style="background:var(--card); border:1px solid var(--border); border-radius:99px; color:var(--t2); padding:4px 8px; font-size:0.75rem; outline:none; cursor:pointer;">
-      <option value="default">Default 🌌</option>
-      <option value="cockpit">Cockpit 🎛️</option>
-      <option value="clouds">Clouds ☁️</option>
-      <option value="lounge">Lounge lounge</option>
-    </select>
+
+  <!-- ==================== SIDE NAVIGATION ==================== -->
+  <div id="sidebar" class="sidebar">
+    <div class="sidebar-header">
+      <h3>القائمة</h3>
+      <button class="close-btn" onclick="toggleSidebar()">✕</button>
+    </div>
+    <div class="sidebar-content">
+      <button class="sidebar-item" onclick="goHome(); toggleSidebar()">🏠 الرئيسية</button>
+      <button class="sidebar-item" onclick="openDashboard(); toggleSidebar()">📊 الإحصائيات</button>
+      <div class="sidebar-divider"></div>
+      <div class="sidebar-label">الرتبة: <span id="rank-badge-sidebar">👨‍🎓 Student</span></div>
+      <div class="sidebar-divider"></div>
+      <div class="sidebar-label">المظهر</div>
+      <select id="bg-selector" onchange="changeBgTheme(this.value)" class="sidebar-select">
+        <option value="default">🌌 Default</option>
+        <option value="cockpit">🎛️ Cockpit</option>
+        <option value="clouds">☁️ Clouds</option>
+        <option value="lounge">🛋️ Lounge</option>
+      </select>
+    </div>
   </div>
 
+  <!-- ==================== SIDEBAR OVERLAY ==================== -->
+  <div id="sidebar-overlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
+</head>
+
+<body>
   <!-- ==================== HOME SCREEN ==================== -->
   <div class="screen active" id="screen-home">
     <div class="home-hero">
@@ -51,9 +56,8 @@
       </div>
       <div class="brand-stats">
         <div class="stat-item"><span class="stat-num" id="stat-words">0</span><span class="stat-lbl">كلمة</span></div>
-        <div class="stat-item"><span class="stat-num" id="stat-units">5</span><span class="stat-lbl">وحدة مكتملة</span>
-        </div>
-        <div class="stat-item"><span class="stat-num">12</span><span class="stat-lbl">وحدة إجمالي</span></div>
+        <div class="stat-item"><span class="stat-num" id="stat-units">0</span><span class="stat-lbl">وحدات</span></div>
+        <div class="stat-item"><span class="stat-num">12</span><span class="stat-lbl">إجمالي</span></div>
       </div>
     </div>
 
@@ -147,18 +151,18 @@
             <div class="term-title">الترم الأول</div>
             <div class="term-subtitle">Units 1 – 6</div>
           </div>
-          <div class="term-badge">جاري 1/6</div>
+          <div class="term-badge" id="term1-badge">جاري 6/6 • 650+ كلمة</div>
         </div>
         <div class="term-progress-bar">
-          <div class="term-progress-fill" style="width:16%"></div>
+          <div class="term-progress-fill" style="width:100%"></div>
         </div>
-        <div class="units-strip">
+        <div class="units-strip" id="term1-units">
           <div class="unit-chip active-unit done" onclick="event.stopPropagation();openUnit(1)">Unit 1 ✓</div>
-          <div class="unit-chip locked">Unit 2</div>
-          <div class="unit-chip locked">Unit 3</div>
-          <div class="unit-chip locked">Unit 4</div>
-          <div class="unit-chip locked">Unit 5</div>
-          <div class="unit-chip locked">Unit 6</div>
+          <div class="unit-chip active-unit done" onclick="event.stopPropagation();openUnit(2)">Unit 2 ✓</div>
+          <div class="unit-chip active-unit done" onclick="event.stopPropagation();openUnit(3)">Unit 3 ✓</div>
+          <div class="unit-chip active-unit done" onclick="event.stopPropagation();openUnit(4)">Unit 4 ✓</div>
+          <div class="unit-chip active-unit done" onclick="event.stopPropagation();openUnit(5)">Unit 5 ✓</div>
+          <div class="unit-chip active-unit done" onclick="event.stopPropagation();openUnit(6)">Unit 6 ✓</div>
         </div>
       </div>
 
@@ -170,18 +174,18 @@
             <div class="term-title">الترم الثاني</div>
             <div class="term-subtitle">Units 7 – 12</div>
           </div>
-          <div class="term-badge">جاري 5/6</div>
+          <div class="term-badge" id="term2-badge">مكتمل 6/6 • 680+ كلمة</div>
         </div>
         <div class="term-progress-bar">
-          <div class="term-progress-fill" style="width:83%"></div>
+          <div class="term-progress-fill" style="width:100%"></div>
         </div>
-        <div class="units-strip">
+        <div class="units-strip" id="term2-units">
           <div class="unit-chip active-unit done" onclick="event.stopPropagation();openUnit(7)">Unit 7 ✓</div>
           <div class="unit-chip active-unit done" onclick="event.stopPropagation();openUnit(8)">Unit 8 ✓</div>
           <div class="unit-chip active-unit done" onclick="event.stopPropagation();openUnit(9)">Unit 9 ✓</div>
           <div class="unit-chip active-unit done" onclick="event.stopPropagation();openUnit(10)">Unit 10 ✓</div>
           <div class="unit-chip active-unit done" onclick="event.stopPropagation();openUnit(11)">Unit 11 ✓</div>
-          <div class="unit-chip locked" onclick="event.stopPropagation()">Unit 12</div>
+          <div class="unit-chip active-unit done" onclick="event.stopPropagation();openUnit(12)">Unit 12 ✓</div>
         </div>
       </div>
     </div>
@@ -189,18 +193,29 @@
 
   <!-- ==================== UNIT SCREEN ==================== -->
   <div class="screen" id="screen-unit">
+    <!-- UNIT HEADER -->
     <div class="unit-header">
-      <button class="back-btn" onclick="goHome()">←</button>
-      <div class="unit-header-title" id="unit-header-title">Unit 7 – At the Airport</div>
+      <button class="back-btn" onclick="goHome()" title="العودة">←</button>
+      <div class="unit-header-content">
+        <div class="unit-header-title" id="unit-header-title">Unit 7</div>
+        <div class="unit-header-subtitle" id="unit-header-subtitle">At the Airport</div>
+      </div>
       <div class="unit-header-badge t2-badge" id="unit-term-badge">ترم 2</div>
     </div>
 
+    <!-- PART TABS -->
     <div class="part-tabs" id="part-tabs-bar">
-      <button class="part-tab ap1" onclick="switchPart(1)" id="ptab1">✈ Part 1 · Lessons 1&2</button>
-      <button class="part-tab" onclick="switchPart(2)" id="ptab2">🛬 Part 2 · Lessons 3-5</button>
+      <button class="part-tab ap1" onclick="switchPart(1)" id="ptab1">Part 1</button>
+      <button class="part-tab" onclick="switchPart(2)" id="ptab2">Part 2</button>
     </div>
 
-    <div class="feat-tabs">
+    <!-- SECTION SELECTOR -->
+    <div class="unit-top-controls">
+      <div class="sec-selector" id="sec-selector"></div>
+    </div>
+
+    <!-- FEATURE TABS - RESPONSIVE -->
+    <div class="feat-tabs horizontal-scroll" id="feat-tabs-container">
       <button class="feat-tab active" onclick="showFeat('flashcard')">🃏 بطاقات</button>
       <button class="feat-tab" onclick="showFeat('quiz')">🎯 MCQ</button>
       <button class="feat-tab" onclick="showFeat('typing')">⌨️ كتابة</button>
@@ -211,8 +226,8 @@
       <button class="feat-tab" onclick="showFeat('summary')">📚 ملخص</button>
     </div>
 
+    <!-- UNIT CONTENT -->
     <div class="unit-content">
-      <div class="sec-selector" id="sec-selector"></div>
 
       <!-- FLASHCARD -->
       <div id="feat-flashcard">
@@ -507,6 +522,30 @@
       </div>
     </div>
   </div>
+
+  <!-- ==================== BOTTOM NAVIGATION BAR ==================== -->
+  <nav id="bottom-nav" class="bottom-nav">
+    <button class="nav-item active" id="nav-home" onclick="showScreen('home')" title="الرئيسية">
+      <span class="nav-icon">🏠</span>
+      <span class="nav-label">Home</span>
+    </button>
+    <button class="nav-item" id="nav-srs" onclick="openSRSReview()" title="المراجعة">
+      <span class="nav-icon">🔁</span>
+      <span class="nav-label">Review</span>
+    </button>
+    <button class="nav-item" id="nav-search-btn" onclick="focusSearch()" title="البحث">
+      <span class="nav-icon">🔍</span>
+      <span class="nav-label">Search</span>
+    </button>
+    <button class="nav-item" id="nav-dashboard" onclick="showScreen('dashboard')" title="الإحصائيات">
+      <span class="nav-icon">📊</span>
+      <span class="nav-label">Stats</span>
+    </button>
+    <button class="nav-item" id="nav-settings" onclick="toggleSidebar()" title="الإعدادات">
+      <span class="nav-icon">⚙️</span>
+      <span class="nav-label">Settings</span>
+    </button>
+  </nav>
 
   <script src="data.js"></script>
   <script src="app.js"></script>

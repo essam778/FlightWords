@@ -1,4 +1,66 @@
 // ========================================================
+// SIDEBAR TOGGLE
+// ========================================================
+function toggleSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('sidebar-overlay');
+  sidebar.classList.toggle('active');
+  overlay.classList.toggle('active');
+  if (sidebar.classList.contains('active')) {
+    document.body.style.overflow = 'hidden';
+  } else {
+    document.body.style.overflow = '';
+  }
+}
+
+// ========================================================
+// BUILD UNITS DYNAMICALLY
+// ========================================================
+function buildUnitsUI() {
+  const heroUnits = document.getElementById('hero-units');
+  if (!heroUnits) return;
+  
+  // Ensure my custom words is there
+  const myWordsCard = heroUnits.querySelector('[onclick*="openUnit(0)"]')?.closest('.term-card');
+  
+  // Build Term 1 and Term 2 cards dynamically
+  let term1Units = [];
+  let term2Units = [];
+  
+  Object.keys(UNITS_DATA).forEach(unitKey => {
+    const unit = UNITS_DATA[unitKey];
+    if (!unit.term) return;
+    
+    if (unit.term === 1) {
+      term1Units.push({ num: parseInt(unitKey), ...unit });
+    } else if (unit.term === 2) {
+      term2Units.push({ num: parseInt(unitKey), ...unit });
+    }
+  });
+  
+  term1Units.sort((a, b) => a.num - b.num);
+  term2Units.sort((a, b) => a.num - b.num);
+  
+  // Update or create term 1 card
+  let term1Card = [...heroUnits.querySelectorAll('.term-card')].find(c => c.textContent.includes('الترم الأول'));
+  if (term1Card) {
+    const unitsStrip = term1Card.querySelector('.units-strip');
+    unitsStrip.innerHTML = term1Units.map((u, i) => 
+      `<div class="unit-chip active-unit done" onclick="event.stopPropagation();openUnit(${u.num})">Unit ${u.num} ✓</div>`
+    ).join('');
+  }
+  
+  // Update or create term 2 card
+  let term2Card = [...heroUnits.querySelectorAll('.term-card')].find(c => c.textContent.includes('الترم الثاني'));
+  if (term2Card) {
+    const unitsStrip = term2Card.querySelector('.units-strip');
+    unitsStrip.innerHTML = term2Units.map((u, i) => 
+      `<div class="unit-chip active-unit ${i < term2Units.length - 1 ? 'done' : ''}" onclick="event.stopPropagation();openUnit(${u.num})">Unit ${u.num} ${i < term2Units.length - 1 ? '✓' : ''}</div>`
+    ).join('');
+  }
+}
+
+// ========================================================
 // STATE
 // ========================================================
 // ========================================================
@@ -99,6 +161,9 @@ function updateDashboardRanks() {
   if (drn) drn.textContent = r.name;
   const ds = document.getElementById('dash-score');
   if (ds) ds.textContent = `${userScore} XP`;
+  // أحدّث sidebar أيضاً
+  const sidebarRank = document.getElementById('rank-badge-sidebar');
+  if (sidebarRank) sidebarRank.textContent = `${r.icon} ${r.name}`;
 }
 
 let streakData = JSON.parse(localStorage.getItem('flightWords_streak') || '{"streak": 0, "lastDate": ""}');
@@ -145,6 +210,12 @@ let autopilotPaused = false;
 let autopilotIndex = 0;
 let autopilotTimer = null;
 let autopilotPool = [];
+
+// Speed Challenge State
+let speedTimer = 60;
+let speedInterval = null;
+let speedScore = 0;
+let currentSpeedWord = null;
 
 function shuffle(array) {
   let cur = array.length, rand;
@@ -407,13 +478,46 @@ function saveCustomWord() {
 }
 
 function goHome() {
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('sidebar-overlay');
+  sidebar.classList.remove('active');
+  overlay.classList.remove('active');
+  document.body.style.overflow = '';
+  
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-home').classList.add('active');
   const search = document.getElementById('global-search');
   if (search) search.value = '';
+  
+  // Update bottom nav
+  updateBottomNav('home');
+}
+
+// Update bottom nav active state
+function updateBottomNav(page) {
+  const navItems = document.querySelectorAll('.nav-item');
+  navItems.forEach(item => item.classList.remove('active'));
+  
+  if (page === 'home') {
+    document.getElementById('nav-home')?.classList.add('active');
+  } else if (page === 'dashboard') {
+    document.getElementById('nav-dashboard')?.classList.add('active');
+  } else if (page === 'search') {
+    document.getElementById('nav-search-btn')?.classList.add('active');
+  } else if (page === 'srs') {
+    document.getElementById('nav-srs')?.classList.add('active');
+  } else if (page === 'settings') {
+    document.getElementById('nav-settings')?.classList.add('active');
+  }
 }
 
 function openDashboard() {
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('sidebar-overlay');
+  sidebar.classList.remove('active');
+  overlay.classList.remove('active');
+  document.body.style.overflow = '';
+  
   updateDashboardRanks();
   renderBadges();
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -423,6 +527,9 @@ function openDashboard() {
   const acc = totalQuizQuestions > 0 ? Math.round((totalQuizCorrect / totalQuizQuestions) * 100) : 0;
   document.getElementById('dash-accuracy').textContent = acc + '%';
   document.getElementById('dash-words').textContent = knownWordsGlobal.size;
+  
+  // Update bottom nav
+  updateBottomNav('dashboard');
 }
 
 function openTermOrUnit(term, unit) {
@@ -430,23 +537,74 @@ function openTermOrUnit(term, unit) {
 }
 
 function openUnit(unitNum) {
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('sidebar-overlay');
+  sidebar.classList.remove('active');
+  overlay.classList.remove('active');
+  document.body.style.overflow = '';
+  
   currentUnit = unitNum;
   const unit = UNITS_DATA[unitNum];
   if (!unit) { showComingSoon(unitNum); return; }
   document.getElementById('screen-home').classList.remove('active');
   document.getElementById('screen-unit').classList.add('active');
-  document.getElementById('unit-header-title').textContent = unitNum === 0 ? "My Words" : `Unit ${unitNum} – ${unit.title}`;
+  const headerTitle = document.getElementById('unit-header-title');
+  const headerSub = document.getElementById('unit-header-subtitle');
+  if (headerTitle) headerTitle.textContent = unitNum === 0 ? "My Words" : `Unit ${unitNum}`;
+  if (headerSub) headerSub.textContent = unit.title || '';
   document.getElementById('unit-term-badge').textContent = unitNum === 0 ? "خاص" : `ترم ${unit.term}`;
   document.getElementById('unit-term-badge').className = 'unit-header-badge ' + (unitNum === 0 ? 't1-badge' : (unit.term === 1 ? 't1-badge' : 't2-badge'));
   currentPart = 1;
   currentFeat = 'flashcard';
   document.querySelectorAll('.feat-tab').forEach((t, i) => { t.classList.toggle('active', i === 0); });
+  // Note: Unit opening doesn't have a specific bottom nav item, so we don't update it
   buildPartTabs();
   switchPart(1);
 }
 
 function showComingSoon(unitNum) {
   alert(`Unit ${unitNum} قريبًا! 🔒\nهنضيف الكلمات لما تبعتها 📸`);
+}
+
+// Show a specific screen
+function showScreen(screenId) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const screen = document.getElementById('screen-' + screenId);
+  if (screen) {
+    screen.classList.add('active');
+    if (screenId === 'home') updateBottomNav('home');
+    else if (screenId === 'dashboard') {
+      updateBottomNav('dashboard');
+      openDashboard();
+    }
+  }
+}
+
+// Focus search input
+function focusSearch() {
+  const search = document.getElementById('global-search');
+  if (search) {
+    search.focus();
+    updateBottomNav('search');
+  }
+}
+
+// Open SRS review
+function openSRSReview() {
+  const today = new Date().toISOString().split('T')[0];
+  const srsWords = Object.entries(srsData).filter(([w, d]) => {
+    const lastReview = new Date(d.lastReviewDate);
+    const nextReview = new Date(lastReview.getTime() + (d.interval * 24 * 60 * 60 * 1000));
+    return new Date() >= nextReview;
+  }).map(([w]) => w);
+  
+  if (srsWords.length === 0) {
+    alert('لا توجد كلمات للمراجعة الآن 🎉');
+    return;
+  }
+  
+  updateBottomNav('srs');
+  alert(`هناك ${srsWords.length} كلمة للمراجعة! 🔄`);
 }
 
 function buildPartTabs() {
@@ -1308,19 +1466,21 @@ function renderSummary() {
 
 function initStats() {
   let total = 0;
-  Object.values(UNITS_DATA).forEach(u => Object.values(u.parts).forEach(p => total += p.words.length));
+  let unitCount = 0;
+  Object.values(UNITS_DATA).forEach(u => {
+    if (u.parts) {
+      unitCount++;
+      Object.values(u.parts).forEach(p => total += p.words.length);
+    }
+  });
   document.getElementById('stat-words').textContent = total;
+  document.getElementById('stat-units').textContent = unitCount;
 }
 initStats();
 
 // ========================================================
 // 60-SECOND SPEED CHALLENGE
 // ========================================================
-let speedTimer = 60;
-let speedInterval = null;
-let speedScore = 0;
-let currentSpeedWord = null;
-
 function startSpeedChallenge() {
   speedScore = 0;
   speedTimer = 60;
@@ -1405,6 +1565,8 @@ if (themeToggle) {
 // INITIAL RENDER & URL PARSING
 // ========================================================
 function initApp() {
+  buildUnitsUI();
+  updateDashboardRanks();
   const params = new URLSearchParams(window.location.search);
   const matchParam = params.get('match');
   if (matchParam) {
@@ -1423,7 +1585,7 @@ function initApp() {
 
   // Default: Go to Home Screen
   document.getElementById('screen-home').classList.add('active');
-  updateDashboardRanks();
+  updateBottomNav('home');
 }
 initApp();
 function changeBgTheme(theme) {
@@ -1436,8 +1598,8 @@ const savedBg = localStorage.getItem('flightWords_bg');
 if (savedBg) {
   changeBgTheme(savedBg);
   setTimeout(() => {
-    const sel = document.getElementById('bg-selector');
-    if (sel) sel.value = savedBg;
+    const sel1 = document.getElementById('bg-selector');
+    if (sel1) sel1.value = savedBg;
   }, 500);
 }
 // ========================================================

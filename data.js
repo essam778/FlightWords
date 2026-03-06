@@ -1,5 +1,5 @@
 // ========================================================
-// DATA — Unit 7 (complete)
+// DATA — English Learning Units (Complete 2026)
 // ========================================================
 const UNITS_DATA = {
   7: {
@@ -1868,5 +1868,176 @@ const UNITS_DATA = {
         ]
       }
     }
-  }
-};
+  },
+  // Unit 2
+  2: {
+    title: 'Sport & Health',
+    term: 1,
+    parts: {
+      1: {
+        label: '🏃 Part 1',
+        sections: { A1: { label: 'Definitions', color: '#c0392b' }, B1: { label: 'Vocabulary', color: '#1a6aaa' }, C1: { label: 'Expressions', color: '#3a7a2a' }, D1: { label: 'Idioms', color: '#8a3aaa' }, E1: { label: 'Synonyms', color: '#aa7a20' }, F1: { label: 'Grammar', color: '#2a8a7a' } },
+        words: [
+          { s: 'A1', en: 'athlete', type: 'n', ar: 'رياضي محترف', icon: '🏃', def: 'A person who plays sports professionally.' },
+          { s: 'A1', en: 'fitness', type: 'n', ar: 'اللياقة البدنية', icon: '💪', def: 'The condition of being physically strong.' },
+          { s: 'B1', en: 'sprint', type: 'v', ar: 'يركض سريعاً', def: 'To run very fast for a short distance.' },
+          { s: 'B1', en: 'endurance', type: 'n', ar: 'التحمل', def: 'Ability to continue doing something difficult.' },
+          { s: 'C1', en: 'stay fit', type: 'exp', ar: 'البقاء بحالة جيدة', def: 'To keep yourself physically healthy.' },
+          { s: 'D1', en: 'break a leg', type: 'idiom', ar: 'بالتوفيق', def: 'Wishing someone good luck.' },
+          { s: 'E1', en: 'vigorous', type: 'adj', ar: 'قوي وحيوي', def: 'Done with a lot of energy and force.' },
+          { s: 'F1', en: 'exhausted', type: 'adj', ar: 'منهك / متعب جداً', def: 'Very tired; having no energy.' }
+        ]
+      },
+      2: {
+        label: '⚽ Part 2',
+        sections: { A2: { label: 'Definitions', color: '#c0392b' }, B2: { label: 'Vocabulary', color: '#1a6aaa' }, C2: { label: 'Expressions', color: '#3a7a2a' }, D2: { label: 'Synonyms', color: '#aa7a20' }, F2: { label: 'Grammar', color: '#2a8a7a' } },
+        words: [
+          { s: 'A2', en: 'champion', type: 'n', ar: 'بطل', icon: '🏆', def: 'A winner of a competition.' },
+          { s: 'B2', en: 'coach', type: 'n', ar: 'مدرب', def: 'A person who teaches sports.' },
+          { s: 'C2', en: 'take up a sport', type: 'exp', ar: 'يبدأ رياضة جديدة', def: 'To start playing a sport.' },
+          { s: 'D2', en: 'injury', type: 'n', ar: 'إصابة', def: 'Damage to the body from an accident.' },
+          { s: 'F2', en: 'injured', type: 'adj', ar: 'مصاب', def: 'Having an injury.' }
+        ]
+      }
+    }
+  },
+  // Unit 3
+  3: {
+    title: 'Shopping & Money',
+    term: 1,
+    parts: {
+      1: {
+        label: '🛍️ Part 1',
+        sections: { A1: { label: 'Definitions', color: '#c0392b' }, B1: { label: 'Vocabulary', color: '#1a6aaa' }, C1: { label: 'Expressions', color: '#3a7a2a' }, F1: { label: 'Grammar', color: '#2a8a7a' } },
+        words: [
+          { s: 'A1', en: 'customer', type: 'n', ar: 'عميل', def: 'A person who buys things from a shop.' },
+          { s: 'A1', en: 'bargain', type: 'n', ar: 'صفقة جيدة', def: 'A thing bought at a very good price.' },
+          { s: 'B1', en: 'expensive', type: 'adj', ar: 'غالي الثمن', def: 'Costs a lot of money.' },
+          { s: 'B1', en: 'budget', type: 'n', ar: 'ميزانية', def: 'The amount of money you have for spending.' },
+          { s: 'C1', en: 'spend money', type: 'exp', ar: 'ينفق المال', def: 'To use money to buy things.' },
+          { s: 'F1', en: 'affordable', type: 'adj', ar: 'بسعر مناسب', def: 'Not too expensive to buy.' }
+        ]
+      },
+      2: {
+        label: '💳 Part 2',
+        sections: { A2: { label: 'Definitions', color: '#c0392b' }, B2: { label: 'Vocabulary', color: '#1a6aaa' }, C2: { label: 'Expressions', color: '#3a7a2a' } },
+        words: [
+          { s: 'A2', en: 'discount', type: 'n', ar: 'خصم', def: 'A reduction in price.' },
+          { s: 'B2', en: 'credit card', type: 'n', ar: 'بطاقة ائتمان', def: 'A card used to buy things and pay later.' },
+          { s: 'C2', en: 'get a good deal', type: 'exp', ar: 'تحصل على سعر جيد', def: 'To pay a reasonable price for something.' }
+        ]
+      }
+    }
+  },
+  // Unit 4
+  4: {
+    title: 'Food & Cooking',
+    term: 1,
+    parts: {
+      1: {
+        label: '🍽️ Part 1',
+        sections: { A1: { label: 'Definitions', color: '#c0392b' }, B1: { label: 'Vocabulary', color: '#1a6aaa' }, C1: { label: 'Expressions', color: '#3a7a2a' }, F1: { label: 'Grammar', color: '#2a8a7a' } },
+        words: [
+          { s: 'A1', en: 'ingredient', type: 'n', ar: 'مكون', def: 'A component of a mixture or dish.' },
+          { s: 'A1', en: 'recipe', type: 'n', ar: 'وصفة طهي', def: 'Instructions for making a dish.' },
+          { s: 'B1', en: 'chef', type: 'n', ar: 'طاهٍ', def: 'A professional cook.' },
+          { s: 'B1', en: 'appetizer', type: 'n', ar: 'مقبلات', def: 'Food served before the main course.' },
+          { s: 'C1', en: 'cook a meal', type: 'exp', ar: 'يطهو وجبة', def: 'To prepare food for eating.' },
+          { s: 'F1', en: 'fresh', type: 'adj', ar: 'طازج', def: 'Recently made or picked.' }
+        ]
+      },
+      2: {
+        label: '👨‍🍳 Part 2',
+        sections: { A2: { label: 'Definitions', color: '#c0392b' }, B2: { label: 'Vocabulary', color: '#1a6aaa' }, C2: { label: 'Expressions', color: '#3a7a2a' } },
+        words: [
+          { s: 'A2', en: 'dessert', type: 'n', ar: 'حلويات / تحلية', def: 'A sweet course at the end of a meal.' },
+          { s: 'B2', en: 'feast', type: 'n', ar: 'وليمة / عيد',def: 'A large meal for a special celebration.' },
+          { s: 'C2', en: 'taste good', type: 'exp', ar: 'طعمه لذيذ', def: 'To have a pleasant flavor.' }
+        ]
+      }
+    }
+  },
+  // Unit 5
+  5: {
+    title: 'Education & School',
+    term: 1,
+    parts: {
+      1: {
+        label: '📚 Part 1',
+        sections: { A1: { label: 'Definitions', color: '#c0392b' }, B1: { label: 'Vocabulary', color: '#1a6aaa' }, C1: { label: 'Expressions', color: '#3a7a2a' }, F1: { label: 'Grammar', color: '#2a8a7a' } },
+        words: [
+          { s: 'A1', en: 'student', type: 'n', ar: 'طالب / طالبة', def: 'A person who learns at school or university.' },
+          { s: 'A1', en: 'subject', type: 'n', ar: 'مادة دراسية', def: 'A topic taught in school.' },
+          { s: 'B1', en: 'assignment', type: 'n', ar: 'واجب منزلي', def: 'Work given to students to do at home.' },
+          { s: 'B1', en: 'exam', type: 'n', ar: 'امتحان', def: 'A test to check knowledge.' },
+          { s: 'C1', en: 'study hard', type: 'exp', ar: 'يدرس بجدية', def: 'To work seriously at learning.' },
+          { s: 'F1', en: 'educational', type: 'adj', ar: 'تعليمي', def: 'Related to teaching and learning.' }
+        ]
+      },
+      2: {
+        label: '✏️ Part 2',
+        sections: { A2: { label: 'Definitions', color: '#c0392b' }, B2: { label: 'Vocabulary', color: '#1a6aaa' }, C2: { label: 'Expressions', color: '#3a7a2a' } },
+        words: [
+          { s: 'A2', en: 'graduate', type: 'v', ar: 'يتخرج', def: 'To finish a course of study successfully.' },
+          { s: 'B2', en: 'scholarship', type: 'n', ar: 'منحة / زمالة', def: 'Money given to a student to study.' },
+          { s: 'C2', en: 'pass an exam', type: 'exp', ar: 'ينجح في امتحان', def: 'To do well enough in a test to succeed.' }
+        ]
+      }
+    }
+  },
+  // Unit 6
+  6: {
+    title: 'Environment & Nature',
+    term: 1,
+    parts: {
+      1: {
+        label: '🌱 Part 1',
+        sections: { A1: { label: 'Definitions', color: '#c0392b' }, B1: { label: 'Vocabulary', color: '#1a6aaa' }, C1: { label: 'Expressions', color: '#3a7a2a' }, F1: { label: 'Grammar', color: '#2a8a7a' } },
+        words: [
+          { s: 'A1', en: 'environment', type: 'n', ar: 'البيئة', def: 'The surroundings or conditions in which people live.' },
+          { s: 'A1', en: 'pollution', type: 'n', ar: 'تلوث', def: 'The presence of harmful substances in the environment.' },
+          { s: 'B1', en: 'forest', type: 'n', ar: 'غابة', def: 'A large area covered with trees.' },
+          { s: 'B1', en: 'climate', type: 'n', ar: 'المناخ', def: 'The weather conditions of an area.' },
+          { s: 'C1', en: 'protect the environment', type: 'exp', ar: 'حماية البيئة', def: 'To keep nature safe from harm.' },
+          { s: 'F1', en: 'renewable', type: 'adj', ar: 'متجدد', def: 'Can be made again or replenished.' }
+        ]
+      },
+      2: {
+        label: '🌍 Part 2',
+        sections: { A2: { label: 'Definitions', color: '#c0392b' }, B2: { label: 'Vocabulary', color: '#1a6aaa' }, C2: { label: 'Expressions', color: '#3a7a2a' } },
+        words: [
+          { s: 'A2', en: 'ecosystem', type: 'n', ar: 'نظام بيئي', def: 'A community of living things and their environment.' },
+          { s: 'B2', en: 'wildlife', type: 'n', ar: 'الحياة البرية', def: 'Wild animals and plants.' },
+          { s: 'C2', en: 'go green', type: 'exp', ar: 'أسلوب حياة صديق للبيئة', def: 'To live in an environmentally friendly way.' }
+        ]
+      }
+    }
+  },
+  // Unit 12
+  12: {
+    title: 'Future Careers',
+    term: 2,
+    parts: {
+      1: {
+        label: '🎯 Part 1',
+        sections: { A1: { label: 'Definitions', color: '#c0392b' }, B1: { label: 'Vocabulary', color: '#1a6aaa' }, C1: { label: 'Expressions', color: '#3a7a2a' }, F1: { label: 'Grammar', color: '#2a8a7a' } },
+        words: [
+          { s: 'A1', en: 'career', type: 'n', ar: 'مهنة / حياة عملية', def: 'Work you do for most of your life.' },
+          { s: 'A1', en: 'ambition', type: 'n', ar: 'طموح', def: 'A strong wish to achieve something.' },
+          { s: 'B1', en: 'skill', type: 'n', ar: 'مهارة', def: 'Ability to do something well.' },
+          { s: 'B1', en: 'interview', type: 'n', ar: 'مقابلة عمل', def: 'A formal meeting to assess someone for a job.' },
+          { s: 'C1', en: 'pursue a dream', type: 'exp', ar: 'يسعى لتحقيق حلم', def: 'To try to achieve an important goal.' },
+          { s: 'F1', en: 'motivated', type: 'adj', ar: 'مدفوعاً / لديه دافع', def: 'Having a strong reason to do something.' }
+        ]
+      },
+      2: {
+        label: '💼 Part 2',
+        sections: { A2: { label: 'Definitions', color: '#c0392b' }, B2: { label: 'Vocabulary', color: '#1a6aaa' }, C2: { label: 'Expressions', color: '#3a7a2a' } },
+        words: [
+          { s: 'A2', en: 'salary', type: 'n', ar: 'راتب / مرتب', def: 'Regular payment for work.' },
+          { s: 'B2', en: 'opportunity', type: 'n', ar: 'فرصة', def: 'A chance to do something.' },
+          { s: 'C2', en: 'succeed in life', type: 'exp', ar: 'ينجح في الحياة', def: 'To achieve your goals and prosper.' }
+        ]
+      }
+    }
+  }};
